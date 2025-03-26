@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package DashElixirFlutter;
+
+message Empty {}
+
+// The actual RPC service definition with HTTP/2 endpoints defined
+service RPC {
+  rpc StreamEcuData (Empty) returns (stream EcuData) {
+    option (google.api.http) = {
+        get: "/streamEcuData"
+    };
+  }
+
+  rpc RebootSystem (Empty) returns (Empty) {
+    option (google.api.http) = {
+        get: "/rebootSystem"
+    };
+  }
+}
+
+// EcuData Info Structures
+message EcuData {
+  float map_kpa = 1;
+  float map_bar = 2;
+  float map_psi = 3;
+  float mat_celsius = 4;
+  float battery_voltage = 5;
+}
