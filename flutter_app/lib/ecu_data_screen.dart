@@ -85,7 +85,7 @@ class EcuDataScreen extends StatelessWidget {
   }
 
   Widget _buildGauges(EcuData ecuData) {
-    const gaugeSize = 300.0;
+    const gaugeSize = 230.0;
 
     return Stack(
       children: [
@@ -94,7 +94,7 @@ class EcuDataScreen extends StatelessWidget {
           child: Text(
             "${ecuData.batteryVoltage.toStringAsFixed(2)} V",
             style: const TextStyle(
-              fontSize: 48,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
               color: Colors.white,
               fontFamily: 'Digital',
