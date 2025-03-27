@@ -9,7 +9,7 @@ defmodule DashElixirFlutter.SizeFraming do
 
   def add_framing(data, state) do
     size = byte_size(data)
-    crc = CRC.crc_32(data)
+    crc = :erlang.crc32(data)
     framed_data = <<size::16, data::binary, crc::32>>
 
     {:ok, framed_data, state}
@@ -35,7 +35,8 @@ defmodule DashElixirFlutter.SizeFraming do
 
   defp process_data(<<>>, frames), do: {<<>>, frames}
 
-  defp process_data(<<size::16, _flag::8, data::binary-size(size - 1), _crc::32>>, frames), do: process_data(<<>>, frames ++ [data])
+  defp process_data(<<size::16, _flag::8, data::binary-size(size - 1), _crc::32>>, frames),
+    do: process_data(<<>>, frames ++ [data])
 
   defp process_data(<<size::16, rest::binary>>, frames), do: {<<size::16, rest::binary>>, frames}
 end
