@@ -24,21 +24,23 @@ config :nerves, :erlinit, update_clock: true
 # * See https://hexdocs.pm/nerves_ssh/readme.html for general SSH configuration
 # * See https://hexdocs.pm/ssh_subsystem_fwup/readme.html for firmware updates
 
-keys =
-  System.user_home!()
-  |> Path.join(".ssh/id_{rsa,ecdsa,ed25519}.pub")
-  |> Path.wildcard()
+# keys =
+#   System.user_home!()
+#   |> Path.join(".ssh/id_{rsa,ecdsa,ed25519}.pub")
+#   |> Path.wildcard()
 
-if keys == [],
-  do:
-    Mix.raise("""
-    No SSH public keys found in ~/.ssh. An ssh authorized key is needed to
-    log into the Nerves device and update firmware on it using ssh.
-    See your project's config.exs for this error message.
-    """)
+# if keys == [],
+#   do:
+#     Mix.raise("""
+#     No SSH public keys found in ~/.ssh. An ssh authorized key is needed to
+#     log into the Nerves device and update firmware on it using ssh.
+#     See your project's config.exs for this error message.
+#     """)
 
 config :nerves_ssh,
-  authorized_keys: Enum.map(keys, &File.read!/1)
+  # authorized_keys: Enum.map(keys, &File.read!/1)
+  authorized_keys:
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC8eKrZNiMIaQ2SLpVHYXEY3fP/iDoHRYivj1s9Udb48gjlCyF7c3POL4Bq4ThDsz+We9GGtJbfEJfj3JDFWvSrMF19UMRiWq5Se56fo1jEE7AcWupO0Mb3huVSqUZTSlhM8jtkoACf8uLBOl4C6qz20NvW0Z7o49jaHhqch+ZpcHCOPmuTchY/kfNUwhueRpmZ1cYHMEvArof/EKRtZ6BdzUCFaYzYuv8xJP1qPwPLlQ098woXu2unS7mV8+dqxVUOGsC+Kr4O7iHMlLGoTgj+3fHpkTWKQckR6jKXsdyvI5XsEtRAq9BhlyNa6rtlu1zKRU1Yo4N2gLWJwDV0Og5N6M2cwX0be1ow0NKJTHEiEgPoNHmqY3pqjV59gW6or3LCYT6Ua6omCi6EXtX9Hc1sfOAK03Ws/mBeH3A1O+ZD48fMsi2oyg0x/X2ovsAmrxryk9A1jHUc2A9YwLZce65M3pyYZPNzz+STG5tluU/UEMiKBMRykibhpc0kvRm8wSU= junior@junior-Aspire-A515-57"
 
 # Configure the network using vintage_net
 #
@@ -59,6 +61,13 @@ config :vintage_net,
        type: VintageNetWiFi,
        vintage_net_wifi: %{
          mode: :infrastructure,
+         networks: [
+           %{
+             key_mgmt: :wpa_psk,
+             ssid: "Junior 2.4Ghz",
+             psk: "17082022"
+           }
+         ]
        },
        ipv4: %{method: :dhcp}
      }}
