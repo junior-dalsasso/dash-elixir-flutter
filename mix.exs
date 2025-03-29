@@ -37,7 +37,6 @@ defmodule DashElixirFlutter.MixProject do
       {:nerves_runtime, "~> 0.13.0"},
       {:nerves_pack, "~> 0.7.1", targets: @all_targets},
       {:nerves_system_rpi4, "~> 1.29.0", runtime: false, targets: :rpi4},
-      {:nerves_system_rpi5, "~> 0.4.0", runtime: false, targets: :rpi5},
       {:nerves_flutter_support, "~> 1.0.0"},
       {:circuits_i2c, "~> 2.0"},
 
@@ -45,7 +44,6 @@ defmodule DashElixirFlutter.MixProject do
       {:circuits_uart, "~> 1.5"},
 
       # Flutter Example Deps
-      {:vintage_net_wifi, "~> 0.12.0", runtime: false},
       {:grpc, "~> 0.9"},
       {:protobuf_generate, "~> 0.1.1"},
       {:jason, "~> 1.4.0"}

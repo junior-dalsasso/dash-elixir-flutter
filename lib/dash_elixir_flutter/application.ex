@@ -26,6 +26,7 @@ defmodule DashElixirFlutter.Application do
   # List all child processes to be supervised
   defp children(:host), do: []
 
+  @dialyzer {:nowarn_function, children: 1}
   defp children(_target) do
     # Bit of a hack, but we need to wait for /dev/dri to exists...
     dri_card = get_output_card()
@@ -47,6 +48,7 @@ defmodule DashElixirFlutter.Application do
     ]
   end
 
+  @dialyzer {:nowarn_function, get_output_card: 0}
   defp get_output_card() do
     Process.sleep(100)
     output = Udev.get_cards() |> Enum.find(fn card -> Udev.is_output_card?(card) end)
