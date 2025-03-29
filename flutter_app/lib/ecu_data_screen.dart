@@ -11,47 +11,47 @@ class EcuDataScreen extends StatelessWidget {
 
   void showRebootConfirm(BuildContext context) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Deseja reiniciar o dispositivo?"),
-          actions: [
-            TextButton(
-              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
-              child: const Text("Cancelar"),
-              onPressed: () => Navigator.of(context).pop()
-            ),
-            TextButton(
-              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
-              child: const Text("Sim"),
-              onPressed: () => API.rebootSystem()
-            )
-          ]
-        );
-      }
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text("Deseja reiniciar o dispositivo?"),
+              actions: [
+                TextButton(
+                    style: TextButton.styleFrom(
+                        textStyle: Theme.of(context).textTheme.labelLarge),
+                    child: const Text("Cancelar"),
+                    onPressed: () => Navigator.of(context).pop()),
+                TextButton(
+                    style: TextButton.styleFrom(
+                        textStyle: Theme.of(context).textTheme.labelLarge),
+                    child: const Text("Sim"),
+                    onPressed: () => API.rebootSystem())
+              ]);
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(left: 30.0),
-        child: Align(
-          alignment: Alignment.bottomLeft,
-          child: InkWell(
+      floatingActionButton: FadeIn(
+        duration: 1500,
+        startDelay: 3000,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 30.0),
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: InkWell(
               borderRadius: BorderRadius.circular(12),
               onTap: () => showRebootConfirm(context),
               child: Container(
                 padding: const EdgeInsets.all(8),
                 child: const Column(
                   mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [Icon(Icons.refresh_rounded, size: 32)],
                 ),
               ),
             ),
+          ),
         ),
       ),
       body: Stack(
@@ -59,7 +59,9 @@ class EcuDataScreen extends StatelessWidget {
           const Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [FadeIn(duration: 1500, startDelay: 500, child: OpalaLogo())],
+            children: [
+              FadeIn(duration: 1500, startDelay: 500, child: OpalaLogo())
+            ],
           ),
           FadeIn(
             duration: 1500,
@@ -72,7 +74,7 @@ class EcuDataScreen extends StatelessWidget {
                   if (!snapshot.hasData) {
                     return const Center(child: Loader());
                   }
-                  
+
                   final ecuData = snapshot.data!;
                   return _buildGauges(ecuData);
                 },
@@ -85,73 +87,66 @@ class EcuDataScreen extends StatelessWidget {
   }
 
   Widget _buildGauges(EcuData ecuData) {
-    const gaugeSize = 230.0;
+    const gaugeSize = 240.0;
 
     return Stack(
       children: [
-        // Texto flutuante da tensão da bateria
         Center(
           child: Text(
             "${ecuData.batteryVoltage.toStringAsFixed(2)} V",
             style: const TextStyle(
-              fontSize: 32,
+              fontSize: 46,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontFamily: 'Digital',
             ),
           ),
         ),
-
-        // Medidores radiais
         Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Linha 1: Temperatura do ar e Pressão (KPA)
               Row(
-                spacing: 56,
+                spacing: 110,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildOptimizedRadialGauge(
-                    title: "Temperatura admissão",
-                    value: ecuData.matCelsius,
-                    min: -10,
-                    max: 100,
-                    size: gaugeSize,
-                    unit: "°C",
-                  ),
+                      title: "Temp. admissão",
+                      value: ecuData.matCelsius,
+                      min: -10,
+                      max: 100,
+                      size: gaugeSize,
+                      unit: "°C",
+                      interval: 10),
                   _buildOptimizedRadialGauge(
-                    title: "Pressão coletor",
-                    value: ecuData.mapKpa,
-                    min: 0,
-                    max: 200,
-                    size: gaugeSize,
-                    unit: "kPa",
-                  ),
+                      title: "Pressão coletor",
+                      value: ecuData.mapKpa,
+                      min: 0,
+                      max: 200,
+                      size: gaugeSize,
+                      unit: "kPa",
+                      interval: 20),
                 ],
               ),
-
-              // Linha 2: Pressão (BAR) e Pressão (PSI)
               Row(
-                spacing: 56,
+                spacing: 110,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildOptimizedRadialGauge(
-                    title: "Pressão coletor",
-                    value: ecuData.mapBar,
-                    min: 0,
-                    max: 2,
-                    size: gaugeSize,
-                    unit: "bar",
-                  ),
+                      title: "Pressão coletor",
+                      value: ecuData.mapBar,
+                      min: 0,
+                      max: 2,
+                      size: gaugeSize,
+                      unit: "bar",
+                      interval: 0.2,
+                      decimals: 2),
                   _buildOptimizedRadialGauge(
-                    title: "Pressão coletor",
-                    value: ecuData.mapPsi,
-                    min: 0,
-                    max: 30,
-                    size: gaugeSize,
-                    unit: "psi",
-                  ),
+                      title: "Pressão coletor",
+                      value: ecuData.mapPsi,
+                      min: 0,
+                      max: 30,
+                      size: gaugeSize,
+                      unit: "psi",
+                      interval: 5),
                 ],
               ),
             ],
@@ -161,29 +156,43 @@ class EcuDataScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOptimizedRadialGauge({
-    required String title,
-    required double value,
-    required double min,
-    required double max,
-    required double size,
-    required String unit,
-  }) {
+  Widget _buildOptimizedRadialGauge(
+      {required String title,
+      required double value,
+      required double min,
+      required double max,
+      required double size,
+      required String unit,
+      required double interval,
+      int decimals = 1}) {
+    List<GaugeAnnotation> annotations = [];
+
+    for (double i = min; i <= max; i += interval) {
+      annotations.add(
+        GaugeAnnotation(
+          widget: Text(i.toStringAsFixed(decimals == 1 ? 0 : decimals), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+          ),
+          angle: ((i - min) / (max - min) * 276) - 228,
+          positionFactor: 0.75,
+        ),
+      );
+    }
+
     return RepaintBoundary(
       child: SizedBox(
         width: size,
         height: size,
         child: SfRadialGauge(
-          enableLoadingAnimation: false,
           axes: <RadialAxis>[
             RadialAxis(
               minimum: min,
               maximum: max,
-              labelOffset: 25,
-              showLastLabel: true,
+              interval: interval,
+              showLabels: false,
+              // showLastLabel: true,
               axisLineStyle: const AxisLineStyle(
                 thicknessUnit: GaugeSizeUnit.factor,
-                thickness: 0.03,
+                thickness: 0.06,
               ),
               majorTickStyle: const MajorTickStyle(
                 length: 6,
@@ -195,11 +204,10 @@ class EcuDataScreen extends StatelessWidget {
                 thickness: 3,
                 color: Colors.white,
               ),
-              axisLabelStyle: const GaugeTextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+              // axisLabelStyle: const GaugeTextStyle(
+              //   fontWeight: FontWeight.bold,
+              //   fontSize: 14,
+              // ),
               pointers: <GaugePointer>[
                 NeedlePointer(
                   value: value,
@@ -210,33 +218,34 @@ class EcuDataScreen extends StatelessWidget {
                   needleStartWidth: 1.5,
                   needleEndWidth: 6,
                   needleColor: Colors.red,
-                  knobStyle: const KnobStyle(knobRadius: 0.09),
+                  knobStyle: const KnobStyle(knobRadius: 0.1),
                 ),
               ],
               annotations: <GaugeAnnotation>[
+                ...annotations,
                 GaugeAnnotation(
                   widget: Text(
-                    "${value.toStringAsFixed(1)} $unit",
+                    "${value.toStringAsFixed(decimals)} $unit",
                     style: const TextStyle(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   angle: 90,
-                  positionFactor: 0.65,
+                  positionFactor: 0.76,
                 ),
                 GaugeAnnotation(
                   widget: Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   angle: 90,
-                  positionFactor: 0.9,
+                  positionFactor: 0.95,
                 ),
               ],
               ranges: <GaugeRange>[
