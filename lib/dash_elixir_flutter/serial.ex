@@ -56,7 +56,7 @@ defmodule DashElixirFlutter.Serial do
         _seconds::16,               # 0-1:      Segundos desde que a ECU foi ligada (não utilizado)
         _pulseWidth1::16,           # 2-3:      Largura do pulso do injetor 1 (ms) (não utilizado)
         _pulseWidth2::16,           # 4-5:      Largura do pulso do injetor 2 (ms) (não utilizado)
-        _rpm::16,                   # 6-7:      RPM do motor (não utilizado)
+        rpm::16,                    # 6-7:      RPM do motor
         _advance::16,               # 8-9:      Avanço de ignição (graus BTDC) (não utilizado)
         _squirt::8,                 # 10:       Bitfield de eventos de injeção (não utilizado)
         _engine::8,                 # 11:       Bitfield de status do motor (não utilizado)
@@ -67,8 +67,8 @@ defmodule DashElixirFlutter.Serial do
         _barometer::16,             # 16-17:    Pressão barométrica (kPa) (não utilizado)
         map::16,                    # 18-19:    Pressão do coletor (MAP) (kPa)
         mat::16,                    # 20-21:    Temperatura do ar no coletor (MAT) (°F)
-        _coolant::16,               # 22-23:    Temperatura do líquido de arrefecimento (°F) (não utilizado)
-        _tps::16,                   # 24-25:    Posição do acelerador (TPS) (%) (não utilizado)
+        coolant::16,                # 22-23:    Temperatura do líquido de arrefecimento (°F)
+        tps::16,                    # 24-25:    Posição do acelerador (TPS) (%) (não utilizado)
         batteryVoltage::16,         # 26-27:    Tensão da bateria (V)
         _afr1::16,                  # 28-29:    AFR1 (AFR) (não utilizado)
         _afr2::16,                  # 30-31:    AFR2 (AFR) (não utilizado)
@@ -111,7 +111,8 @@ defmodule DashElixirFlutter.Serial do
         _spare10::16,               # 102-103:  Não utilizado
         _rest::binary
       >> ->
-        mat_celsius = (mat / 10 - 32) * 5 / 9
+        coolant_celsius = (coolant / 32) * 5 / 9
+        mat_celsius = (mat / 32) * 5 / 9
         map_kpa = map / 10
         map_bar = map_kpa / 100
         map_psi = map_kpa * 0.1450377
@@ -121,7 +122,10 @@ defmodule DashElixirFlutter.Serial do
           map_bar: Float.round(map_bar, 2),
           map_psi: Float.round(map_psi, 2),
           mat_celsius: Float.round(mat_celsius, 2),
-          battery_voltage: batteryVoltage / 10
+          battery_voltage: batteryVoltage / 10,
+          rpm: rpm,
+          coolant: Float.round(coolant_celsius, 2),
+          tps: tps
         }}
 
       _ -> :error

@@ -3,10 +3,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 class OpalaLogo extends HookWidget {
   final double height;
-  const OpalaLogo({super.key, this.height = 300});
+  final double width;
+
+  const OpalaLogo({super.key, this.height = 600, this.width = 600});
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset("images/opala_fundo.png", width: 600, height: 600, fit: BoxFit.contain);
+    return Image.asset("images/opala_fundo.png", height: height, width: width, fit: BoxFit.contain);
   }
 }

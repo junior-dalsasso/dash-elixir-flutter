@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api.dart';
 import 'package:flutter_app/generated/rpc_schema.pbgrpc.dart';
-import 'package:flutter_app/loader.dart';
 import 'package:flutter_app/opala_logo.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:flutter_app/fade_in.dart';
+import 'package:intl/intl.dart';
 
 class EcuDataScreen extends StatelessWidget {
   const EcuDataScreen({super.key});
@@ -32,83 +32,147 @@ class EcuDataScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FadeIn(
-        duration: 1500,
-        startDelay: 3000,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 30.0),
-          child: Align(
-            alignment: Alignment.bottomLeft,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () => showRebootConfirm(context),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [Icon(Icons.refresh_rounded, size: 32)],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          const Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FadeIn(duration: 1500, startDelay: 500, child: OpalaLogo())
-            ],
-          ),
-          FadeIn(
-            duration: 1500,
-            startDelay: 3000,
-            child: Container(
-              color: ThemeData.dark().scaffoldBackgroundColor,
-              child: StreamBuilder<EcuData>(
-                stream: API.streamEcuData(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: Loader());
-                  }
+    return Stack(
+      children: [_intro(), _buildScaffold()],
+    );
+  }
 
-                  final ecuData = snapshot.data!;
-                  return _buildGauges(ecuData);
-                },
-              ),
-            ),
-          ),
-        ],
+  Color _getBatteryColor(double value) {
+    if (value > 13) return Colors.green;
+    if (value > 12.2) return Colors.blue;
+    return Colors.red;
+  }
+
+  Color _getRpmColor(double value) {
+    if (value > 4000) return Colors.red;
+    if (value > 2000) return Colors.blue;
+    return Colors.green;
+  }
+
+  Color _getTempColor(double value) {
+    if (value > 90) return Colors.red;
+    if (value > 40) return Colors.green;
+    return Colors.blue;
+  }
+
+  Color _getTpsColor(double value) {
+    if (value > 80) return Colors.red;
+    if (value > 40) return Colors.blue;
+    return Colors.green;
+  }
+
+  Widget _intro() {
+    return const Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [FadeIn(duration: 1500, startDelay: 500, child: OpalaLogo())],
+    );
+  }
+
+  Widget _buildScaffold() {
+    return FadeIn(
+      duration: 1500,
+      startDelay: 3000,
+      child: Scaffold(
+        body: StreamBuilder<EcuData>(
+          stream: API.streamEcuData(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return _buildPage(snapshot.data!, context);
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildGauges(EcuData ecuData) {
+  Widget _buildPage(EcuData ecuData, BuildContext context) {
     const gaugeSize = 240.0;
+    DateTime now = DateTime.now().subtract(const Duration(hours: 3)); // Add a way to set time
 
-    return Stack(
+    return Row(
       children: [
-        Center(
-          child: Text(
-            "${ecuData.batteryVoltage.toStringAsFixed(2)} V",
-            style: const TextStyle(
-              fontSize: 46,
-              fontWeight: FontWeight.bold,
+        Container(
+          color: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateFormat("HH:mm:ss").format(now),
+                      style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      DateFormat("dd/MM/yyyy").format(now),
+                      style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Icon(Icons.electric_car, color: _getBatteryColor(ecuData.batteryVoltage)),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${ecuData.batteryVoltage.toStringAsFixed(2)} V",
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.speed, color: _getRpmColor(ecuData.rpm)),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${ecuData.rpm.toInt()} RPM",
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.thermostat, color: _getTempColor(ecuData.coolant)),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${ecuData.coolant.toStringAsFixed(2)} °C",
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.airlines_outlined, color: _getTpsColor(ecuData.tps)),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${ecuData.tps.toInt()} %",
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => showRebootConfirm(context),
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text("Reiniciar", style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(minimumSize: const Size(180, 50)),
+                ),
+              ],
             ),
           ),
         ),
-        Center(
+        Expanded(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(
-                spacing: 110,
+                spacing: 36,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildOptimizedRadialGauge(
+                  _buildRadialGauge(
                       title: "Temp. admissão",
                       value: ecuData.matCelsius,
                       min: -10,
@@ -116,7 +180,7 @@ class EcuDataScreen extends StatelessWidget {
                       size: gaugeSize,
                       unit: "°C",
                       interval: 10),
-                  _buildOptimizedRadialGauge(
+                  _buildRadialGauge(
                       title: "Pressão coletor",
                       value: ecuData.mapKpa,
                       min: 0,
@@ -127,10 +191,10 @@ class EcuDataScreen extends StatelessWidget {
                 ],
               ),
               Row(
-                spacing: 110,
+                spacing: 36,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildOptimizedRadialGauge(
+                  _buildRadialGauge(
                       title: "Pressão coletor",
                       value: ecuData.mapBar,
                       min: 0,
@@ -139,7 +203,7 @@ class EcuDataScreen extends StatelessWidget {
                       unit: "bar",
                       interval: 0.2,
                       decimals: 2),
-                  _buildOptimizedRadialGauge(
+                  _buildRadialGauge(
                       title: "Pressão coletor",
                       value: ecuData.mapPsi,
                       min: 0,
@@ -151,12 +215,12 @@ class EcuDataScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
+        )
       ],
     );
   }
 
-  Widget _buildOptimizedRadialGauge(
+  Widget _buildRadialGauge(
       {required String title,
       required double value,
       required double min,
@@ -170,7 +234,10 @@ class EcuDataScreen extends StatelessWidget {
     for (double i = min; i <= max; i += interval) {
       annotations.add(
         GaugeAnnotation(
-          widget: Text(i.toStringAsFixed(decimals == 1 ? 0 : decimals), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+          widget: Text(
+            i.toStringAsFixed(decimals == 1 ? 0 : decimals),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
           ),
           angle: ((i - min) / (max - min) * 276) - 228,
           positionFactor: 0.75,

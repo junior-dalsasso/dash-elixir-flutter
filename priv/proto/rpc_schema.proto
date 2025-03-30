@@ -28,4 +28,7 @@ message EcuData {
   float map_psi = 3;
   float mat_celsius = 4;
   float battery_voltage = 5;
+  float rpm = 6;
+  float coolant = 7;
+  float tps = 8;
 }

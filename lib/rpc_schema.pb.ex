@@ -12,6 +12,9 @@ defmodule DashElixirFlutter.EcuData do
   field :map_psi, 3, type: :float, json_name: "mapPsi"
   field :mat_celsius, 4, type: :float, json_name: "matCelsius"
   field :battery_voltage, 5, type: :float, json_name: "batteryVoltage"
+  field :rpm, 6, type: :float
+  field :coolant, 7, type: :float
+  field :tps, 8, type: :float
 end
 
 defmodule DashElixirFlutter.RPC.Service do

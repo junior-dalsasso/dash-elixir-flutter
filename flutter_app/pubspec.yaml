@@ -22,6 +22,7 @@ dependencies:
   circular_buffer: ^0.12.0
   loading_animation_widget: ^1.3.0
   syncfusion_flutter_gauges: ^29.1.33
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

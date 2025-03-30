@@ -53,6 +53,9 @@ class EcuData extends $pb.GeneratedMessage {
     $core.double? mapPsi,
     $core.double? matCelsius,
     $core.double? batteryVoltage,
+    $core.double? rpm,
+    $core.double? coolant,
+    $core.double? tps,
   }) {
     final $result = create();
     if (mapKpa != null) {
@@ -70,6 +73,15 @@ class EcuData extends $pb.GeneratedMessage {
     if (batteryVoltage != null) {
       $result.batteryVoltage = batteryVoltage;
     }
+    if (rpm != null) {
+      $result.rpm = rpm;
+    }
+    if (coolant != null) {
+      $result.coolant = coolant;
+    }
+    if (tps != null) {
+      $result.tps = tps;
+    }
     return $result;
   }
   EcuData._() : super();
@@ -82,6 +94,9 @@ class EcuData extends $pb.GeneratedMessage {
     ..a<$core.double>(3, _omitFieldNames ? '' : 'mapPsi', $pb.PbFieldType.OF)
     ..a<$core.double>(4, _omitFieldNames ? '' : 'matCelsius', $pb.PbFieldType.OF)
     ..a<$core.double>(5, _omitFieldNames ? '' : 'batteryVoltage', $pb.PbFieldType.OF)
+    ..a<$core.double>(6, _omitFieldNames ? '' : 'rpm', $pb.PbFieldType.OF)
+    ..a<$core.double>(7, _omitFieldNames ? '' : 'coolant', $pb.PbFieldType.OF)
+    ..a<$core.double>(8, _omitFieldNames ? '' : 'tps', $pb.PbFieldType.OF)
     ..hasRequiredFields = false
   ;
 
@@ -150,6 +165,33 @@ class EcuData extends $pb.GeneratedMessage {
   $core.bool hasBatteryVoltage() => $_has(4);
   @$pb.TagNumber(5)
   void clearBatteryVoltage() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.double get rpm => $_getN(5);
+  @$pb.TagNumber(6)
+  set rpm($core.double v) { $_setFloat(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasRpm() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearRpm() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.double get coolant => $_getN(6);
+  @$pb.TagNumber(7)
+  set coolant($core.double v) { $_setFloat(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasCoolant() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearCoolant() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.double get tps => $_getN(7);
+  @$pb.TagNumber(8)
+  set tps($core.double v) { $_setFloat(7, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasTps() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearTps() => clearField(8);
 }
 
 

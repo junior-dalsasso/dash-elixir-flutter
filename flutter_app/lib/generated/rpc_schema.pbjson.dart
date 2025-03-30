@@ -31,6 +31,9 @@ const EcuData$json = {
     {'1': 'map_psi', '3': 3, '4': 1, '5': 2, '10': 'mapPsi'},
     {'1': 'mat_celsius', '3': 4, '4': 1, '5': 2, '10': 'matCelsius'},
     {'1': 'battery_voltage', '3': 5, '4': 1, '5': 2, '10': 'batteryVoltage'},
+    {'1': 'rpm', '3': 6, '4': 1, '5': 2, '10': 'rpm'},
+    {'1': 'coolant', '3': 7, '4': 1, '5': 2, '10': 'coolant'},
+    {'1': 'tps', '3': 8, '4': 1, '5': 2, '10': 'tps'},
   ],
 };
 
@@ -38,5 +41,6 @@ const EcuData$json = {
 final $typed_data.Uint8List ecuDataDescriptor = $convert.base64Decode(
     'CgdFY3VEYXRhEhcKB21hcF9rcGEYASABKAJSBm1hcEtwYRIXCgdtYXBfYmFyGAIgASgCUgZtYX'
     'BCYXISFwoHbWFwX3BzaRgDIAEoAlIGbWFwUHNpEh8KC21hdF9jZWxzaXVzGAQgASgCUgptYXRD'
-    'ZWxzaXVzEicKD2JhdHRlcnlfdm9sdGFnZRgFIAEoAlIOYmF0dGVyeVZvbHRhZ2U=');
+    'ZWxzaXVzEicKD2JhdHRlcnlfdm9sdGFnZRgFIAEoAlIOYmF0dGVyeVZvbHRhZ2USEAoDcnBtGA'
+    'YgASgCUgNycG0SGAoHY29vbGFudBgHIAEoAlIHY29vbGFudBIQCgN0cHMYCCABKAJSA3Rwcw==');
 
