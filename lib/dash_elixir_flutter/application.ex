@@ -8,6 +8,7 @@ defmodule DashElixirFlutter.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {Task, fn -> init_bluetooth() end},
       {GRPC.Server.Supervisor, endpoint: DashElixirFlutter.RPC.Endpoint, port: 50051, start_server: true},
       {DashElixirFlutter.Serial, :ok}
     ] ++ children(Nerves.Runtime.mix_target())
@@ -58,5 +59,27 @@ defmodule DashElixirFlutter.Application do
     else
       output
     end
+  end
+
+  defp init_bluetooth() do
+    System.cmd("modprobe", ["bluetooth"])
+    System.cmd("modprobe", ["hci_uart"])
+    File.rm_rf("/run/messagebus.pid")
+    File.mkdir_p!("/run/dbus")
+
+    Process.sleep(3000)
+    Port.open({:spawn_executable, "/usr/bin/dbus-daemon"}, [:binary, :exit_status, :stderr_to_stdout, args: ["--system", "--nofork"]])
+
+    Process.sleep(3000)
+    System.cmd("hciattach", ["/dev/ttyAMA1", "bcm43xx", "921600", "noflow"])
+    Process.sleep(3000)
+    System.cmd("hciattach", ["/dev/ttyAMA1", "bcm43xx", "921600", "noflow"])
+    Process.sleep(3000)
+    System.cmd("hciconfig", ["hci0", "up"])
+    Process.sleep(3000)
+    Port.open({:spawn_executable, "/usr/libexec/bluetooth/bluetoothd"}, [:binary, :exit_status, :stderr_to_stdout, args: ["-n", "-d"]])
+    Process.sleep(3000)
+
+    System.cmd("bluetoothctl", ["power", "on"])
   end
 end

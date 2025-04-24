@@ -6,7 +6,7 @@ defmodule DashElixirFlutter.MixProject do
 
   # We currently support Raspberry Pi 4 and 5.
   # Other aarch64 platforms should also work, but require testing.
-  @all_targets [:rpi4, :rpi5]
+  @all_targets [:rpi4, :rpi4_bluez]
 
   def project do
     [
@@ -36,9 +36,11 @@ defmodule DashElixirFlutter.MixProject do
       {:toolshed, "~> 0.4.0"},
       {:nerves_runtime, "~> 0.13.0"},
       {:nerves_pack, "~> 0.7.1", targets: @all_targets},
-      {:nerves_system_rpi4, "~> 1.29.0", runtime: false, targets: :rpi4},
+      # {:nerves_system_rpi4, "~> 1.30.0", runtime: false, targets: :rpi4},
+      {:nerves_system_rpi4_bluez, "~> 1.30.0", runtime: false, targets: :rpi4_bluez, path: "../nerves_system_rpi4", nerves: [compile: true]},
       {:nerves_flutter_support, "~> 1.0.0"},
       {:circuits_i2c, "~> 2.0"},
+      {:muontrap, "~> 1.0"},
 
       # Serial Deps
       {:circuits_uart, "~> 1.5"},
