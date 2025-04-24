@@ -7,11 +7,19 @@ defmodule DashElixirFlutter.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      {Task, fn -> init_bluetooth() end},
+    base_children = [
       {GRPC.Server.Supervisor, endpoint: DashElixirFlutter.RPC.Endpoint, port: 50051, start_server: true},
       {DashElixirFlutter.Serial, :ok}
-    ] ++ children(Nerves.Runtime.mix_target())
+    ]
+
+    children =
+      if Nerves.Runtime.mix_target() != :host do
+        [{Task, fn -> init_bluetooth() end} | base_children]
+      else
+        base_children
+      end
+
+    children = children ++ children(Nerves.Runtime.mix_target())
 
     opts = [strategy: :one_for_one, name: DashElixirFlutter.Supervisor]
 
