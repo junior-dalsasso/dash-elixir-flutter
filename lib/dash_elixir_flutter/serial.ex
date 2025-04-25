@@ -31,18 +31,18 @@ defmodule DashElixirFlutter.Serial do
       :ok ->
         # Logger.error("Conexão realizada com sucesso!")
         :timer.send_interval(300, :tick)
-        {:ok, %{uart: uart_pid, ina219: ina219_state}}
+        {:ok, %{uart_pid: uart_pid, ina219: ina219_state}}
 
       {:error, _reason} ->
         :timer.send_interval(1000, :error)
-        {:ok, %{uart: nil, ina219: ina219_state}}
+        {:ok, %{uart_pid: nil, ina219: ina219_state}}
     end
   end
 
   @impl true
   def handle_info(:tick, state) do
-    Circuits.UART.flush(state.uart, :both)    # Limpar o buffer antes de cada envio
-    Circuits.UART.write(state.uart, <<?A>>)   # Comando 'A' para solicitar dados em tempo real
+    Circuits.UART.flush(state.uart_pid, :both)    # Limpar o buffer antes de cada envio
+    Circuits.UART.write(state.uart_pid, <<?A>>)   # Comando 'A' para solicitar dados em tempo real
 
     {:noreply, state}
   end
@@ -76,7 +76,7 @@ defmodule DashElixirFlutter.Serial do
     end
 
     init(:ok)
-    {:noreply, %{uart: nil, ina219: state.ina219}}
+    {:noreply, %{uart_pid: nil, ina219: state.ina219}}
   end
 
   def handle_info({:circuits_uart, _port, data}, %{ina219: ina219} = state) do
@@ -106,7 +106,7 @@ defmodule DashElixirFlutter.Serial do
     end
   end
 
-  defp get_battery_data(nil), do: %{battery_percentage: nil}
+  defp get_battery_data(nil), do: {:ok, 0}
 
   defp get_battery_data(ina219) do
     case INA219.get_battery_percentage(ina219) do
