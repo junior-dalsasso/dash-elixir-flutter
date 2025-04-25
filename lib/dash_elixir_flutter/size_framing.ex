@@ -39,4 +39,6 @@ defmodule DashElixirFlutter.SizeFraming do
     do: process_data(<<>>, frames ++ [data])
 
   defp process_data(<<size::16, rest::binary>>, frames), do: {<<size::16, rest::binary>>, frames}
+
+  defp process_data(data, frames), do: {data, frames}
 end

@@ -178,34 +178,37 @@ class EcuDataScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        _getRpiBatteryColorAndIcon(ecuData.rpiBatteryPerc),
-                        const SizedBox(width: 8),
-                        Text(
-                          "${ecuData.rpiBatteryPerc.toInt()} %",
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        _getRpiConnectionColorAndIcon(ecuData.connected),
-                        const SizedBox(width: 8),
-                        Text(
-                          ecuData.connected ? "Conectado" : "Desconectado",
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
-                ElevatedButton.icon(
-                  onPressed: () => showRebootConfirm(context),
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: const Text("Reiniciar", style: TextStyle(fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(minimumSize: const Size(180, 50)),
-                ),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(
+                    children: [
+                      _getRpiBatteryColorAndIcon(ecuData.rpiBatteryPerc),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${ecuData.rpiBatteryPerc.toInt()} %",
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      _getRpiConnectionColorAndIcon(ecuData.connected),
+                      const SizedBox(width: 8),
+                      Text(
+                        ecuData.connected ? "Conectado" : "Desconectado",
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    onPressed: () => showRebootConfirm(context),
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text("Reiniciar", style: TextStyle(fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(minimumSize: const Size(180, 50)),
+                  ),
+                ]),
               ],
             ),
           ),

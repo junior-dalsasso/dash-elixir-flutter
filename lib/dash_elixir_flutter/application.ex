@@ -29,7 +29,7 @@ defmodule DashElixirFlutter.Application do
   end
 
   def log_time() do
-    Logger.info("Current monotonic time is: #{:erlang.monotonic_time()}")
+    # Logger.info("Current monotonic time is: #{:erlang.monotonic_time()}")
   end
 
   # List all child processes to be supervised
