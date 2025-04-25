@@ -85,7 +85,7 @@ defmodule DashElixirFlutter.Application do
     Process.sleep(3000)
     System.cmd("hciconfig", ["hci0", "up"])
     Process.sleep(3000)
-    Port.open({:spawn_executable, "/usr/libexec/bluetooth/bluetoothd"}, [:binary, :exit_status, :stderr_to_stdout, args: ["-n", "-d"]])
+    Port.open({:spawn_executable, "/usr/libexec/bluetooth/bluetoothd"}, [:binary, :exit_status, :stderr_to_stdout, args: ["--compat", "-n", "-d"]])
     Process.sleep(3000)
 
     System.cmd("bluetoothctl", ["power", "on"])

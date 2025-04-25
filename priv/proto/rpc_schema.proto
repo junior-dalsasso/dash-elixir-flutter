@@ -31,4 +31,6 @@ message EcuData {
   float rpm = 6;
   float coolant = 7;
   float tps = 8;
+  float rpi_battery_perc = 9;
+  bool connected = 10;
 }

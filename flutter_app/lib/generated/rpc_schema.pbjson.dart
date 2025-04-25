@@ -34,6 +34,8 @@ const EcuData$json = {
     {'1': 'rpm', '3': 6, '4': 1, '5': 2, '10': 'rpm'},
     {'1': 'coolant', '3': 7, '4': 1, '5': 2, '10': 'coolant'},
     {'1': 'tps', '3': 8, '4': 1, '5': 2, '10': 'tps'},
+    {'1': 'rpi_battery_perc', '3': 9, '4': 1, '5': 2, '10': 'rpiBatteryPerc'},
+    {'1': 'connected', '3': 10, '4': 1, '5': 8, '10': 'connected'},
   ],
 };
 
@@ -42,5 +44,7 @@ final $typed_data.Uint8List ecuDataDescriptor = $convert.base64Decode(
     'CgdFY3VEYXRhEhcKB21hcF9rcGEYASABKAJSBm1hcEtwYRIXCgdtYXBfYmFyGAIgASgCUgZtYX'
     'BCYXISFwoHbWFwX3BzaRgDIAEoAlIGbWFwUHNpEh8KC21hdF9jZWxzaXVzGAQgASgCUgptYXRD'
     'ZWxzaXVzEicKD2JhdHRlcnlfdm9sdGFnZRgFIAEoAlIOYmF0dGVyeVZvbHRhZ2USEAoDcnBtGA'
-    'YgASgCUgNycG0SGAoHY29vbGFudBgHIAEoAlIHY29vbGFudBIQCgN0cHMYCCABKAJSA3Rwcw==');
+    'YgASgCUgNycG0SGAoHY29vbGFudBgHIAEoAlIHY29vbGFudBIQCgN0cHMYCCABKAJSA3RwcxIo'
+    'ChBycGlfYmF0dGVyeV9wZXJjGAkgASgCUg5ycGlCYXR0ZXJ5UGVyYxIcCgljb25uZWN0ZWQYCi'
+    'ABKAhSCWNvbm5lY3RlZA==');
 

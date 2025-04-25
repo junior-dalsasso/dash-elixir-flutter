@@ -5,3 +5,8 @@ SupportedTechnologies=BR/EDR;
 Trusted=true
 Blocked=false
 Services=00001101-0000-1000-8000-00805f9b34fb;
+
+[LinkKey]
+Key=72D17DDFF53840813D96F02DFE011469
+Type=0
+PINLength=0

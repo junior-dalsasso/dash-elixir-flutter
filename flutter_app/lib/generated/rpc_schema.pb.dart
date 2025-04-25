@@ -56,6 +56,8 @@ class EcuData extends $pb.GeneratedMessage {
     $core.double? rpm,
     $core.double? coolant,
     $core.double? tps,
+    $core.double? rpiBatteryPerc,
+    $core.bool? connected,
   }) {
     final $result = create();
     if (mapKpa != null) {
@@ -82,6 +84,12 @@ class EcuData extends $pb.GeneratedMessage {
     if (tps != null) {
       $result.tps = tps;
     }
+    if (rpiBatteryPerc != null) {
+      $result.rpiBatteryPerc = rpiBatteryPerc;
+    }
+    if (connected != null) {
+      $result.connected = connected;
+    }
     return $result;
   }
   EcuData._() : super();
@@ -97,6 +105,8 @@ class EcuData extends $pb.GeneratedMessage {
     ..a<$core.double>(6, _omitFieldNames ? '' : 'rpm', $pb.PbFieldType.OF)
     ..a<$core.double>(7, _omitFieldNames ? '' : 'coolant', $pb.PbFieldType.OF)
     ..a<$core.double>(8, _omitFieldNames ? '' : 'tps', $pb.PbFieldType.OF)
+    ..a<$core.double>(9, _omitFieldNames ? '' : 'rpiBatteryPerc', $pb.PbFieldType.OF)
+    ..aOB(10, _omitFieldNames ? '' : 'connected')
     ..hasRequiredFields = false
   ;
 
@@ -192,6 +202,24 @@ class EcuData extends $pb.GeneratedMessage {
   $core.bool hasTps() => $_has(7);
   @$pb.TagNumber(8)
   void clearTps() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.double get rpiBatteryPerc => $_getN(8);
+  @$pb.TagNumber(9)
+  set rpiBatteryPerc($core.double v) { $_setFloat(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasRpiBatteryPerc() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearRpiBatteryPerc() => clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.bool get connected => $_getBF(9);
+  @$pb.TagNumber(10)
+  set connected($core.bool v) { $_setBool(9, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasConnected() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearConnected() => clearField(10);
 }
 
 

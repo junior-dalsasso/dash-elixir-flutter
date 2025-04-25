@@ -17,7 +17,12 @@ defmodule DashElixirFlutter.StreamServer do
       map_bar: data.map_bar,
       map_psi: data.map_psi,
       mat_celsius: data.mat_celsius,
-      battery_voltage: data.battery_voltage
+      battery_voltage: data.battery_voltage,
+      rpm: data.rpm,
+      coolant: data.coolant,
+      tps: data.tps,
+      rpi_battery_perc: data.rpi_battery_perc,
+      connected: data.connected
     }
 
     # Envia os dados para o cliente gRPC

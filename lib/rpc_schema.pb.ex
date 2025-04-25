@@ -15,6 +15,8 @@ defmodule DashElixirFlutter.EcuData do
   field :rpm, 6, type: :float
   field :coolant, 7, type: :float
   field :tps, 8, type: :float
+  field :rpi_battery_perc, 9, type: :float, json_name: "rpiBatteryPerc"
+  field :connected, 10, type: :bool
 end
 
 defmodule DashElixirFlutter.RPC.Service do
