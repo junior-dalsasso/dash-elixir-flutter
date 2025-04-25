@@ -5,35 +5,58 @@ import 'package:flutter_app/opala_logo.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:flutter_app/fade_in.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class EcuDataScreen extends StatelessWidget {
   const EcuDataScreen({super.key});
 
-  void showRebootConfirm(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Text("Deseja reiniciar o dispositivo?"),
-              actions: [
-                TextButton(
-                    style: TextButton.styleFrom(
-                        textStyle: Theme.of(context).textTheme.labelLarge),
-                    child: const Text("Cancelar"),
-                    onPressed: () => Navigator.of(context).pop()),
-                TextButton(
-                    style: TextButton.styleFrom(
-                        textStyle: Theme.of(context).textTheme.labelLarge),
-                    child: const Text("Sim"),
-                    onPressed: () => API.rebootSystem())
-              ]);
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [_intro(), _buildScaffold()],
+      children: [
+        _intro(),
+        FadeIn(
+          duration: 1500,
+          startDelay: 3000,
+          child: Scaffold(
+            body: StreamBuilder<EcuData>(
+              stream: API.streamEcuData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) return const Center(child: Text("Erro na conexão"));
+
+                return _buildPage(snapshot.data, context);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void showRebootConfirm(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Deseja reiniciar o dispositivo?"),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+              child: const Text("Sim"),
+              onPressed: () => API.rebootSystem(),
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -61,6 +84,24 @@ class EcuDataScreen extends StatelessWidget {
     return Colors.green;
   }
 
+  Icon _getRpiBatteryColorAndIcon(double value) {
+    if (value > 99) return const Icon(Icons.battery_full_rounded, color: Colors.green);
+    if (value > 80) return const Icon(Icons.battery_6_bar_rounded, color: Colors.green);
+    if (value > 70) return const Icon(Icons.battery_5_bar_rounded, color: Colors.blue);
+    if (value > 50) return const Icon(Icons.battery_4_bar_rounded, color: Colors.blue);
+    if (value > 35) return const Icon(Icons.battery_3_bar_rounded, color: Colors.red);
+    if (value > 20) return const Icon(Icons.battery_2_bar_rounded, color: Colors.red);
+    if (value > 10) return const Icon(Icons.battery_1_bar_rounded, color: Colors.red);
+
+    return const Icon(Icons.battery_0_bar_rounded, color: Colors.red);
+  }
+
+  Icon _getRpiConnectionColorAndIcon(bool value) {
+    return value
+      ? const Icon(Icons.signal_wifi_4_bar, color: Colors.green)
+      : const Icon(Icons.signal_wifi_connected_no_internet_4_rounded, color: Colors.red);
+  }
+
   Widget _intro() {
     return const Row(
       mainAxisSize: MainAxisSize.max,
@@ -69,31 +110,15 @@ class EcuDataScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScaffold() {
-    return FadeIn(
-      duration: 1500,
-      startDelay: 3000,
-      child: Scaffold(
-        body: StreamBuilder<EcuData>(
-          stream: API.streamEcuData(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return _buildPage(snapshot.data!, context);
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPage(EcuData ecuData, BuildContext context) {
+  Widget _buildPage(EcuData? ecuData, BuildContext context) {
     const gaugeSize = 240.0;
-    DateTime now = DateTime.now().subtract(const Duration(hours: 3)); // Add a way to set time
+    DateTime now = DateTime.now().subtract(const Duration(hours: 3));
+
+    ecuData ??= EcuData();
 
     return Row(
       children: [
+        // Sidebar
         Container(
           color: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
           child: Padding(
@@ -148,7 +173,27 @@ class EcuDataScreen extends StatelessWidget {
                         Icon(Icons.airlines_outlined, color: _getTpsColor(ecuData.tps)),
                         const SizedBox(width: 8),
                         Text(
-                          "${ecuData.tps.toInt()} %",
+                          "${ecuData.tps > 100 ? 100 : ecuData.tps.toInt()} %",
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        _getRpiBatteryColorAndIcon(ecuData.rpiBatteryPerc),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${ecuData.rpiBatteryPerc.toInt()} %",
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        _getRpiConnectionColorAndIcon(ecuData.connected),
+                        const SizedBox(width: 8),
+                        Text(
+                          ecuData.connected ? "Conectado" : "Desconectado",
                           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -165,53 +210,66 @@ class EcuDataScreen extends StatelessWidget {
             ),
           ),
         ),
+        // Main content
         Expanded(
-          child: Column(
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              Row(
-                spacing: 36,
-                mainAxisAlignment: MainAxisAlignment.center,
+              Column(
                 children: [
-                  _buildRadialGauge(
-                      title: "Temp. admissão",
-                      value: ecuData.matCelsius,
-                      min: -10,
-                      max: 100,
-                      size: gaugeSize,
-                      unit: "°C",
-                      interval: 10),
-                  _buildRadialGauge(
-                      title: "Pressão coletor",
-                      value: ecuData.mapKpa,
-                      min: 0,
-                      max: 200,
-                      size: gaugeSize,
-                      unit: "kPa",
-                      interval: 20),
+                  Row(
+                    spacing: 36,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildRadialGauge(
+                        title: "Temp. admissão",
+                        value: ecuData.matCelsius,
+                        min: -10,
+                        max: 100,
+                        size: gaugeSize,
+                        unit: "°C",
+                        interval: 10,
+                      ),
+                      _buildRadialGauge(
+                        title: "Pressão coletor",
+                        value: ecuData.mapKpa,
+                        min: 0,
+                        max: 200,
+                        size: gaugeSize,
+                        unit: "kPa",
+                        interval: 20,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    spacing: 36,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildRadialGauge(
+                          title: "Pressão coletor",
+                          value: ecuData.mapBar,
+                          min: 0,
+                          max: 2,
+                          size: gaugeSize,
+                          unit: "bar",
+                          interval: 0.2,
+                          decimals: 2),
+                      _buildRadialGauge(
+                          title: "Pressão coletor",
+                          value: ecuData.mapPsi,
+                          min: 0,
+                          max: 30,
+                          size: gaugeSize,
+                          unit: "psi",
+                          interval: 5),
+                    ],
+                  ),
                 ],
               ),
-              Row(
-                spacing: 36,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildRadialGauge(
-                      title: "Pressão coletor",
-                      value: ecuData.mapBar,
-                      min: 0,
-                      max: 2,
-                      size: gaugeSize,
-                      unit: "bar",
-                      interval: 0.2,
-                      decimals: 2),
-                  _buildRadialGauge(
-                      title: "Pressão coletor",
-                      value: ecuData.mapPsi,
-                      min: 0,
-                      max: 30,
-                      size: gaugeSize,
-                      unit: "psi",
-                      interval: 5),
-                ],
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: SvgPicture.asset("images/D6_logo.svg"),
               ),
             ],
           ),
@@ -236,8 +294,7 @@ class EcuDataScreen extends StatelessWidget {
         GaugeAnnotation(
           widget: Text(
             i.toStringAsFixed(decimals == 1 ? 0 : decimals),
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
           ),
           angle: ((i - min) / (max - min) * 276) - 228,
           positionFactor: 0.75,
