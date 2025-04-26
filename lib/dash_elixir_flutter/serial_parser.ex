@@ -81,7 +81,8 @@ defmodule DashElixirFlutter.SerialParser do
           battery_voltage: batteryVoltage / 10,
           rpm: rpm,
           coolant: Float.round(coolant_celsius, 2),
-          tps: tps
+          tps: tps,
+          connected: true
         }}
 
       _ -> :error

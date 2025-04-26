@@ -7,29 +7,17 @@ defmodule DashElixirFlutter.Application do
 
   @impl true
   def start(_type, _args) do
-    base_children = [
-      {GRPC.Server.Supervisor, endpoint: DashElixirFlutter.RPC.Endpoint, port: 50051, start_server: true},
-      {DashElixirFlutter.Serial, :ok}
-    ]
-
     children =
-      if Nerves.Runtime.mix_target() != :host do
-        [{Task, fn -> init_bluetooth() end} | base_children]
-      else
-        base_children
-      end
-
-    children = children ++ children(Nerves.Runtime.mix_target())
+      [
+        {GRPC.Server.Supervisor,
+         endpoint: DashElixirFlutter.RPC.Endpoint, port: 50051, start_server: true}
+      ] ++
+        children(Nerves.Runtime.mix_target()) ++
+        [DashElixirFlutter.BluetoothInit, DashElixirFlutter.Serial]
 
     opts = [strategy: :one_for_one, name: DashElixirFlutter.Supervisor]
 
-    :timer.apply_interval(:timer.seconds(5), __MODULE__, :log_time, [])
-
     Supervisor.start_link(children, opts)
-  end
-
-  def log_time() do
-    # Logger.info("Current monotonic time is: #{:erlang.monotonic_time()}")
   end
 
   # List all child processes to be supervised
@@ -46,8 +34,8 @@ defmodule DashElixirFlutter.Application do
       "GALLIUM_HUD_PERIOD" => "0.25",
       "GALLIUM_HUD_SCALE" => "3",
       "GALLIUM_HUD_VISIBLE" => "false",
-      "GALLIUM_HUD_TOGGLE_SIGNAL" => "10"
-    }
+      "GALLIUM_HUD_TOGGLE_SIGNAL" => "10",
+    } |> Map.merge(NervesTimeZones.tz_environment())
 
     [
       NervesFlutterSupport.Flutter.Engine.create_child(
@@ -67,27 +55,5 @@ defmodule DashElixirFlutter.Application do
     else
       output
     end
-  end
-
-  defp init_bluetooth() do
-    System.cmd("modprobe", ["bluetooth"])
-    System.cmd("modprobe", ["hci_uart"])
-    File.rm_rf("/run/messagebus.pid")
-    File.mkdir_p!("/run/dbus")
-
-    Process.sleep(3000)
-    Port.open({:spawn_executable, "/usr/bin/dbus-daemon"}, [:binary, :exit_status, :stderr_to_stdout, args: ["--system", "--nofork"]])
-
-    Process.sleep(3000)
-    System.cmd("hciattach", ["/dev/ttyAMA1", "bcm43xx", "921600", "noflow"])
-    Process.sleep(3000)
-    System.cmd("hciattach", ["/dev/ttyAMA1", "bcm43xx", "921600", "noflow"])
-    Process.sleep(3000)
-    System.cmd("hciconfig", ["hci0", "up"])
-    Process.sleep(3000)
-    Port.open({:spawn_executable, "/usr/libexec/bluetooth/bluetoothd"}, [:binary, :exit_status, :stderr_to_stdout, args: ["--compat", "-n", "-d"]])
-    Process.sleep(3000)
-
-    System.cmd("bluetoothctl", ["power", "on"])
   end
 end

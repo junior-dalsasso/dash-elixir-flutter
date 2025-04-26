@@ -19,8 +19,8 @@ class EcuDataScreen extends StatelessWidget {
           duration: 1500,
           startDelay: 3000,
           child: Scaffold(
-            body: StreamBuilder<EcuData>(
-              stream: API.streamEcuData(),
+            body: StreamBuilder<StreamData>(
+              stream: API.streamData(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   // return const Center(child: CircularProgressIndicator());
@@ -98,8 +98,8 @@ class EcuDataScreen extends StatelessWidget {
 
   Icon _getRpiConnectionColorAndIcon(bool value) {
     return value
-      ? const Icon(Icons.signal_wifi_4_bar, color: Colors.green)
-      : const Icon(Icons.signal_wifi_connected_no_internet_4_rounded, color: Colors.red);
+        ? const Icon(Icons.bluetooth_connected, color: Colors.green)
+        : const Icon(Icons.bluetooth_disabled, color: Colors.red);
   }
 
   Widget _intro() {
@@ -110,16 +110,19 @@ class EcuDataScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPage(EcuData? ecuData, BuildContext context) {
+  Widget _buildPage(StreamData? data, BuildContext context) {
     const gaugeSize = 240.0;
-    DateTime now = DateTime.now().subtract(const Duration(hours: 3));
+    DateTime now = DateTime.now();
 
-    ecuData ??= EcuData();
+    data ??= StreamData();
+    var ecuData = data.ecuData;
+    var rpiInfo = data.rpiInfo;
 
     return Row(
       children: [
         // Sidebar
         Container(
+          width: 200,
           color: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
           child: Padding(
             padding: const EdgeInsets.all(10),
@@ -180,35 +183,34 @@ class EcuDataScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(
-                    children: [
-                      _getRpiBatteryColorAndIcon(ecuData.rpiBatteryPerc),
-                      const SizedBox(width: 8),
-                      Text(
-                        "${ecuData.rpiBatteryPerc.toInt()} %",
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      _getRpiConnectionColorAndIcon(ecuData.connected),
-                      const SizedBox(width: 8),
-                      Text(
-                        ecuData.connected ? "Conectado" : "Desconectado",
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton.icon(
-                    onPressed: () => showRebootConfirm(context),
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: const Text("Reiniciar", style: TextStyle(fontWeight: FontWeight.bold)),
-                    style: ElevatedButton.styleFrom(minimumSize: const Size(180, 50)),
-                  ),
-                ]),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            _getRpiBatteryColorAndIcon(rpiInfo.batteryPerc),
+                            const SizedBox(width: 8),
+                            Text(
+                              "${rpiInfo.batteryPerc.toInt()} %",
+                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        _getRpiConnectionColorAndIcon(ecuData.connected)
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: () => showRebootConfirm(context),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text("Reiniciar", style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(minimumSize: const Size(180, 50)),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

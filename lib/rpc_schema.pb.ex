@@ -15,8 +15,22 @@ defmodule DashElixirFlutter.EcuData do
   field :rpm, 6, type: :float
   field :coolant, 7, type: :float
   field :tps, 8, type: :float
-  field :rpi_battery_perc, 9, type: :float, json_name: "rpiBatteryPerc"
-  field :connected, 10, type: :bool
+  field :connected, 9, type: :bool
+end
+
+defmodule DashElixirFlutter.RpiInfo do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  field :battery_perc, 1, type: :float, json_name: "batteryPerc"
+end
+
+defmodule DashElixirFlutter.StreamData do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  field :ecu_data, 1, type: DashElixirFlutter.EcuData, json_name: "ecuData"
+  field :rpi_info, 2, type: DashElixirFlutter.RpiInfo, json_name: "rpiInfo"
 end
 
 defmodule DashElixirFlutter.RPC.Service do
@@ -24,7 +38,7 @@ defmodule DashElixirFlutter.RPC.Service do
 
   use GRPC.Service, name: "DashElixirFlutter.RPC", protoc_gen_elixir_version: "0.14.0"
 
-  rpc(:StreamEcuData, DashElixirFlutter.Empty, stream(DashElixirFlutter.EcuData), %{
+  rpc(:StreamInfo, DashElixirFlutter.Empty, stream(DashElixirFlutter.StreamData), %{
     http: %{
       type: Google.Api.PbExtension,
       value: %Google.Api.HttpRule{
@@ -32,7 +46,7 @@ defmodule DashElixirFlutter.RPC.Service do
         body: "",
         additional_bindings: [],
         response_body: "",
-        pattern: {:get, "/streamEcuData"},
+        pattern: {:get, "/streamInfo"},
         __unknown_fields__: []
       }
     }

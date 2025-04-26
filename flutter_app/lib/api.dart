@@ -15,22 +15,16 @@ class API {
     }
 
     // Create the gRPC channel and stub
-    _channel = ClientChannel(
-      _baseHostname,
-      port: 50051,
-      options:
-          const ChannelOptions(
-            credentials: ChannelCredentials.insecure(),
-            idleTimeout: Duration(minutes: 1)
-          )
-    );
+    _channel = ClientChannel(_baseHostname,
+        port: 50051,
+        options: const ChannelOptions(credentials: ChannelCredentials.insecure(), idleTimeout: Duration(minutes: 1)));
 
     _client = RPCClient(_channel!, options: CallOptions());
   }
 
-  static Stream<EcuData> streamEcuData() {
+  static Stream<StreamData> streamData() {
     final request = Empty();
-    return _client!.streamEcuData(request);
+    return _client!.streamInfo(request);
   }
 
   static Future<Empty> rebootSystem() async {

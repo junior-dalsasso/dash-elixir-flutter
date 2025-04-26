@@ -21,10 +21,10 @@ export 'rpc_schema.pb.dart';
 
 @$pb.GrpcServiceName('DashElixirFlutter.RPC')
 class RPCClient extends $grpc.Client {
-  static final _$streamEcuData = $grpc.ClientMethod<$0.Empty, $0.EcuData>(
-      '/DashElixirFlutter.RPC/StreamEcuData',
+  static final _$streamInfo = $grpc.ClientMethod<$0.Empty, $0.StreamData>(
+      '/DashElixirFlutter.RPC/StreamInfo',
       ($0.Empty value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $0.EcuData.fromBuffer(value));
+      ($core.List<$core.int> value) => $0.StreamData.fromBuffer(value));
   static final _$rebootSystem = $grpc.ClientMethod<$0.Empty, $0.Empty>(
       '/DashElixirFlutter.RPC/RebootSystem',
       ($0.Empty value) => value.writeToBuffer(),
@@ -36,8 +36,8 @@ class RPCClient extends $grpc.Client {
       : super(channel, options: options,
         interceptors: interceptors);
 
-  $grpc.ResponseStream<$0.EcuData> streamEcuData($0.Empty request, {$grpc.CallOptions? options}) {
-    return $createStreamingCall(_$streamEcuData, $async.Stream.fromIterable([request]), options: options);
+  $grpc.ResponseStream<$0.StreamData> streamInfo($0.Empty request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$streamInfo, $async.Stream.fromIterable([request]), options: options);
   }
 
   $grpc.ResponseFuture<$0.Empty> rebootSystem($0.Empty request, {$grpc.CallOptions? options}) {
@@ -50,13 +50,13 @@ abstract class RPCServiceBase extends $grpc.Service {
   $core.String get $name => 'DashElixirFlutter.RPC';
 
   RPCServiceBase() {
-    $addMethod($grpc.ServiceMethod<$0.Empty, $0.EcuData>(
-        'StreamEcuData',
-        streamEcuData_Pre,
+    $addMethod($grpc.ServiceMethod<$0.Empty, $0.StreamData>(
+        'StreamInfo',
+        streamInfo_Pre,
         false,
         true,
         ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
-        ($0.EcuData value) => value.writeToBuffer()));
+        ($0.StreamData value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.Empty, $0.Empty>(
         'RebootSystem',
         rebootSystem_Pre,
@@ -66,14 +66,14 @@ abstract class RPCServiceBase extends $grpc.Service {
         ($0.Empty value) => value.writeToBuffer()));
   }
 
-  $async.Stream<$0.EcuData> streamEcuData_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async* {
-    yield* streamEcuData(call, await request);
+  $async.Stream<$0.StreamData> streamInfo_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async* {
+    yield* streamInfo(call, await request);
   }
 
   $async.Future<$0.Empty> rebootSystem_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async {
     return rebootSystem(call, await request);
   }
 
-  $async.Stream<$0.EcuData> streamEcuData($grpc.ServiceCall call, $0.Empty request);
+  $async.Stream<$0.StreamData> streamInfo($grpc.ServiceCall call, $0.Empty request);
   $async.Future<$0.Empty> rebootSystem($grpc.ServiceCall call, $0.Empty request);
 }

@@ -8,8 +8,8 @@ end
 defmodule DashElixirFlutter.RPC.Server do
   use GRPC.Server, service: DashElixirFlutter.RPC.Service, http_transcode: true
 
-  @spec stream_ecu_data(DashElixirFlutter.Empty.t(), GRPC.Server.Stream.t()) :: :ok
-  def stream_ecu_data(_request, stream) do
+  @spec stream_info(DashElixirFlutter.Empty.t(), GRPC.Server.Stream.t()) :: :ok
+  def stream_info(_request, stream) do
     # Inicia o StreamServer com a stream gRPC
     {:ok, _pid} = DashElixirFlutter.StreamServer.start_link(stream: stream)
 

@@ -8,9 +8,9 @@ message Empty {}
 
 // The actual RPC service definition with HTTP/2 endpoints defined
 service RPC {
-  rpc StreamEcuData (Empty) returns (stream EcuData) {
+  rpc StreamInfo (Empty) returns (stream StreamData) {
     option (google.api.http) = {
-        get: "/streamEcuData"
+        get: "/streamInfo"
     };
   }
 
@@ -31,6 +31,14 @@ message EcuData {
   float rpm = 6;
   float coolant = 7;
   float tps = 8;
-  float rpi_battery_perc = 9;
-  bool connected = 10;
+  bool connected = 9;
+}
+
+message RpiInfo {
+  float battery_perc = 1;
+}
+
+message StreamData {
+  EcuData ecu_data = 1;
+  RpiInfo rpi_info = 2;
 }

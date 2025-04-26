@@ -56,7 +56,6 @@ class EcuData extends $pb.GeneratedMessage {
     $core.double? rpm,
     $core.double? coolant,
     $core.double? tps,
-    $core.double? rpiBatteryPerc,
     $core.bool? connected,
   }) {
     final $result = create();
@@ -84,9 +83,6 @@ class EcuData extends $pb.GeneratedMessage {
     if (tps != null) {
       $result.tps = tps;
     }
-    if (rpiBatteryPerc != null) {
-      $result.rpiBatteryPerc = rpiBatteryPerc;
-    }
     if (connected != null) {
       $result.connected = connected;
     }
@@ -105,8 +101,7 @@ class EcuData extends $pb.GeneratedMessage {
     ..a<$core.double>(6, _omitFieldNames ? '' : 'rpm', $pb.PbFieldType.OF)
     ..a<$core.double>(7, _omitFieldNames ? '' : 'coolant', $pb.PbFieldType.OF)
     ..a<$core.double>(8, _omitFieldNames ? '' : 'tps', $pb.PbFieldType.OF)
-    ..a<$core.double>(9, _omitFieldNames ? '' : 'rpiBatteryPerc', $pb.PbFieldType.OF)
-    ..aOB(10, _omitFieldNames ? '' : 'connected')
+    ..aOB(9, _omitFieldNames ? '' : 'connected')
     ..hasRequiredFields = false
   ;
 
@@ -204,22 +199,131 @@ class EcuData extends $pb.GeneratedMessage {
   void clearTps() => clearField(8);
 
   @$pb.TagNumber(9)
-  $core.double get rpiBatteryPerc => $_getN(8);
+  $core.bool get connected => $_getBF(8);
   @$pb.TagNumber(9)
-  set rpiBatteryPerc($core.double v) { $_setFloat(8, v); }
+  set connected($core.bool v) { $_setBool(8, v); }
   @$pb.TagNumber(9)
-  $core.bool hasRpiBatteryPerc() => $_has(8);
+  $core.bool hasConnected() => $_has(8);
   @$pb.TagNumber(9)
-  void clearRpiBatteryPerc() => clearField(9);
+  void clearConnected() => clearField(9);
+}
 
-  @$pb.TagNumber(10)
-  $core.bool get connected => $_getBF(9);
-  @$pb.TagNumber(10)
-  set connected($core.bool v) { $_setBool(9, v); }
-  @$pb.TagNumber(10)
-  $core.bool hasConnected() => $_has(9);
-  @$pb.TagNumber(10)
-  void clearConnected() => clearField(10);
+class RpiInfo extends $pb.GeneratedMessage {
+  factory RpiInfo({
+    $core.double? batteryPerc,
+  }) {
+    final $result = create();
+    if (batteryPerc != null) {
+      $result.batteryPerc = batteryPerc;
+    }
+    return $result;
+  }
+  RpiInfo._() : super();
+  factory RpiInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory RpiInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RpiInfo', package: const $pb.PackageName(_omitMessageNames ? '' : 'DashElixirFlutter'), createEmptyInstance: create)
+    ..a<$core.double>(1, _omitFieldNames ? '' : 'batteryPerc', $pb.PbFieldType.OF)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  RpiInfo clone() => RpiInfo()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  RpiInfo copyWith(void Function(RpiInfo) updates) => super.copyWith((message) => updates(message as RpiInfo)) as RpiInfo;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static RpiInfo create() => RpiInfo._();
+  RpiInfo createEmptyInstance() => create();
+  static $pb.PbList<RpiInfo> createRepeated() => $pb.PbList<RpiInfo>();
+  @$core.pragma('dart2js:noInline')
+  static RpiInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RpiInfo>(create);
+  static RpiInfo? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.double get batteryPerc => $_getN(0);
+  @$pb.TagNumber(1)
+  set batteryPerc($core.double v) { $_setFloat(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasBatteryPerc() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearBatteryPerc() => clearField(1);
+}
+
+class StreamData extends $pb.GeneratedMessage {
+  factory StreamData({
+    EcuData? ecuData,
+    RpiInfo? rpiInfo,
+  }) {
+    final $result = create();
+    if (ecuData != null) {
+      $result.ecuData = ecuData;
+    }
+    if (rpiInfo != null) {
+      $result.rpiInfo = rpiInfo;
+    }
+    return $result;
+  }
+  StreamData._() : super();
+  factory StreamData.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory StreamData.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StreamData', package: const $pb.PackageName(_omitMessageNames ? '' : 'DashElixirFlutter'), createEmptyInstance: create)
+    ..aOM<EcuData>(1, _omitFieldNames ? '' : 'ecuData', subBuilder: EcuData.create)
+    ..aOM<RpiInfo>(2, _omitFieldNames ? '' : 'rpiInfo', subBuilder: RpiInfo.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  StreamData clone() => StreamData()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  StreamData copyWith(void Function(StreamData) updates) => super.copyWith((message) => updates(message as StreamData)) as StreamData;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static StreamData create() => StreamData._();
+  StreamData createEmptyInstance() => create();
+  static $pb.PbList<StreamData> createRepeated() => $pb.PbList<StreamData>();
+  @$core.pragma('dart2js:noInline')
+  static StreamData getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<StreamData>(create);
+  static StreamData? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  EcuData get ecuData => $_getN(0);
+  @$pb.TagNumber(1)
+  set ecuData(EcuData v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasEcuData() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearEcuData() => clearField(1);
+  @$pb.TagNumber(1)
+  EcuData ensureEcuData() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  RpiInfo get rpiInfo => $_getN(1);
+  @$pb.TagNumber(2)
+  set rpiInfo(RpiInfo v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasRpiInfo() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRpiInfo() => clearField(2);
+  @$pb.TagNumber(2)
+  RpiInfo ensureRpiInfo() => $_ensure(1);
 }
 
 

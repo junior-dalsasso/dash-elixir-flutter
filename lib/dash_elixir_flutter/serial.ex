@@ -1,12 +1,28 @@
 defmodule DashElixirFlutter.Serial do
-  alias DashElixirFlutter.SerialParser
-  require Logger
   use GenServer
 
-  def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  alias DashElixirFlutter.RpiInfo
+  alias DashElixirFlutter.StreamData
+  alias DashElixirFlutter.EcuData
+  alias DashElixirFlutter.AuxFuncs
+  alias DashElixirFlutter.SerialParser
+
+  require Logger
+
+  @usb_port "/dev/ttyUSB0"
+  @bt_port "/dev/rfcomm0"
+
+  @update_interval 500
+  @first_connect_delay 1_000
+
+  @send_tick_delay 1000
+  @send_try_connect_delay 1000
+  @send_verify_connection_delay 5000
+
+  def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
   @impl true
-  def init(:ok) do
+  def init(_) do
     {:ok, uart_pid} = Circuits.UART.start_link()
 
     Circuits.UART.configure(uart_pid,
@@ -14,107 +30,131 @@ defmodule DashElixirFlutter.Serial do
       active: true
     )
 
-    # Inicializa o INA219
-    ina219_state =
-      if Nerves.Runtime.mix_target() != :host do
-        case INA219.open("i2c-1", addr: 0x42) do
-        {:ok, state} -> state
-        {:error, reason} ->
-          Logger.error("Failed to initialize INA219: #{inspect(reason)}")
-          nil
-        end
-      else
-        nil
-      end
+    ina219_state = AuxFuncs.initialize_ina219()
+    AuxFuncs.bind_rfcomm()
 
-    case Circuits.UART.open(uart_pid, "/dev/ttyUSB0", speed: 115_200, active: true) do
-      :ok ->
-        # Logger.error("Conexão realizada com sucesso!")
-        :timer.send_interval(300, :tick)
-        {:ok, %{uart_pid: uart_pid, ina219: ina219_state}}
+    Process.send_after(self(), :try_connect, @first_connect_delay)
+    :timer.send_interval(@update_interval, :update_stream)
 
-      {:error, _reason} ->
-        :timer.send_interval(1000, :error)
-        {:ok, %{uart_pid: nil, ina219: ina219_state}}
-    end
+    {:ok,
+     %{
+       config: %{
+         uart_pid: uart_pid,
+         ina219: ina219_state,
+         ref_timer: nil,
+         request_state: nil
+       },
+       ecu_data: %EcuData{
+         map_kpa: 0,
+         map_bar: 0,
+         map_psi: 0,
+         mat_celsius: 0,
+         battery_voltage: 0,
+         rpm: 0,
+         coolant: 0,
+         tps: 0,
+         connected: false
+       }
+     }}
   end
 
   @impl true
-  def handle_info(:tick, state) do
-    Circuits.UART.flush(state.uart_pid, :both)    # Limpar o buffer antes de cada envio
-    Circuits.UART.write(state.uart_pid, <<?A>>)   # Comando 'A' para solicitar dados em tempo real
+  def handle_info(:try_connect, %{config: %{uart_pid: uart_pid}} = state) do
+    serial_port =
+      cond do
+        File.exists?(@bt_port) -> @bt_port
+        File.exists?(@usb_port) -> @usb_port
+        true -> nil
+      end
+
+    case Circuits.UART.open(uart_pid, serial_port, speed: 115_200, active: true) do
+      :ok ->
+        Logger.info("Conexão realizada com sucesso! 🚀")
+        Process.send_after(self(), :tick, @send_tick_delay)
+
+      {:error, _reason} ->
+        Logger.error("Erro ao realizar conexão! 🙁")
+        Process.send_after(self(), :try_connect, @send_try_connect_delay)
+    end
 
     {:noreply, state}
   end
 
-  def handle_info(:error, state) do
-    rpi_battery_perc =
-      if Nerves.Runtime.mix_target() != :host do
-        case get_battery_data(state.ina219) do
-          {:ok, battery_perc} -> battery_perc
-          _ -> 0
-        end
-      else
-        0
-      end
+  def handle_info(:tick, state) do
+    # Limpar o buffer antes de cada envio
+    Circuits.UART.flush(state.config.uart_pid, :both)
+    # Comando 'A' para solicitar dados em tempo real
+    Circuits.UART.write(state.config.uart_pid, <<?A>>)
+    Process.send_after(self(), :verify_connection, @send_verify_connection_delay)
 
-    ecu_data = %{
-      map_kpa: 0,
-      map_bar: 0,
-      map_psi: 0,
-      mat_celsius: 0,
-      battery_voltage: 0,
-      rpm: 0,
-      coolant: 0,
-      tps: 0,
-      rpi_battery_perc: rpi_battery_perc,
-      connected: false
-    }
-
-    if Process.whereis(DashElixirFlutter.StreamServer) do
-      send(DashElixirFlutter.StreamServer, {:ecu_data, ecu_data})
-    end
-
-    init(:ok)
-    {:noreply, %{uart_pid: nil, ina219: state.ina219}}
+    {:noreply, %{state | config: %{state.config | request_state: :sent}}}
   end
 
-  def handle_info({:circuits_uart, _port, data}, %{ina219: ina219} = state) do
+  def handle_info(:verify_connection, state) do
+    case state.config.request_state do
+      :sent ->
+        Logger.error("Conexão deu timeout! 🙁")
+
+        Circuits.UART.flush(state.config.uart_pid, :both)
+        Circuits.UART.close(state.config.uart_pid)
+        Process.send_after(self(), :try_connect, @send_try_connect_delay)
+
+        {:noreply,
+         %{
+           state
+           | config: %{state.config | request_state: :timed_out},
+             ecu_data: %{state.ecu_data | connected: false}
+         }}
+
+      _ ->
+        {:noreply, state}
+    end
+  end
+
+  def handle_info({:circuits_uart, _port, data}, state) do
     case SerialParser.parse_data(data) do
       {:ok, parsed_data} ->
-        {:ok, battery_perc} = get_battery_data(ina219)
+        Logger.info("Dados processados com sucesso! 🚀")
+        Process.send_after(self(), :tick, @send_tick_delay)
 
-        ecu_data = %{
-          map_kpa: parsed_data.map_kpa,
-          map_bar: parsed_data.map_bar,
-          map_psi: parsed_data.map_psi,
-          mat_celsius: parsed_data.mat_celsius,
-          battery_voltage: parsed_data.battery_voltage,
-          rpm: parsed_data.rpm,
-          coolant: parsed_data.coolant,
-          tps: parsed_data.tps,
-          rpi_battery_perc: battery_perc,
-          connected: true
-        }
+        {:noreply,
+         %{
+           state
+           | ecu_data: Map.merge(state.ecu_data, parsed_data),
+             config: %{state.config | request_state: :received}
+         }}
 
-        if Process.whereis(DashElixirFlutter.StreamServer) do
-          send(DashElixirFlutter.StreamServer, {:ecu_data, ecu_data})
+      :error ->
+        case state.config.request_state do
+          :sent ->
+            Logger.error("Erro ao processar dados! 🙁")
+            Process.send_after(self(), :tick, @send_tick_delay)
+
+            {:noreply,
+             %{
+               state
+               | config: %{state.config | request_state: :received}
+             }}
+
+          _ ->
+            {:noreply, state}
         end
-        {:noreply, state}
-
-      :error -> {:error, state}
     end
   end
 
-  defp get_battery_data(nil), do: {:ok, 0}
-
-  defp get_battery_data(ina219) do
-    case INA219.get_battery_percentage(ina219) do
-      {:ok, {percentage, _new_state}} ->
-        {:ok, percentage}
-      {:error, reason} ->
-        Logger.error("Failed to read battery percentage: #{inspect(reason)}")
-        {:error, reason}
+  def handle_info(
+        :update_stream,
+        %{config: %{ina219: ina219_state}} = state
+      ) do
+    if Process.whereis(DashElixirFlutter.StreamServer) do
+      DashElixirFlutter.StreamServer.send_data(
+         %StreamData{
+           ecu_data: state.ecu_data,
+           rpi_info: %RpiInfo{battery_perc: AuxFuncs.get_battery_data(ina219_state)}
+         }
+      )
     end
+
+    {:noreply, state}
   end
 end
