@@ -1,7 +1,4 @@
 defmodule DashElixirFlutter.AuxFuncs do
-
-  @bluetooth_mac "98:D3:71:F6:E7:82"
-
   def initialize_ina219 do
     if Nerves.Runtime.mix_target() != :host do
       case INA219.open("i2c-1", addr: 0x42) do
@@ -10,13 +7,6 @@ defmodule DashElixirFlutter.AuxFuncs do
       end
     else
       nil
-    end
-  end
-
-  def bind_rfcomm do
-    if Nerves.Runtime.mix_target() != :host do
-      System.cmd("rfcomm", ["release", "0"])
-      System.cmd("rfcomm", ["bind", "0", @bluetooth_mac])
     end
   end
 

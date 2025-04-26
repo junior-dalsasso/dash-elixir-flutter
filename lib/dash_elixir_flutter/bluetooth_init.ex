@@ -3,6 +3,8 @@ defmodule DashElixirFlutter.BluetoothInit do
 
   require Logger
 
+  @bluetooth_mac "98:D3:71:F6:E7:82"
+
   def start_link(opts \\ []),
     do: GenServer.start_link(__MODULE__, opts, name: __MODULE__, timeout: :infinity)
 
@@ -41,6 +43,10 @@ defmodule DashElixirFlutter.BluetoothInit do
       Process.sleep(3000)
 
       System.cmd("bluetoothctl", ["power", "on"])
+
+      System.cmd("rfcomm", ["release", "0"])
+      System.cmd("rfcomm", ["bind", "0", @bluetooth_mac])
+
       Logger.warning("BT ligado com sucesso! 🚀")
     end
 

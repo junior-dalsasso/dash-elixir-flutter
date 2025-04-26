@@ -12,37 +12,22 @@ defmodule DashElixirFlutter.Serial do
   @usb_port "/dev/ttyUSB0"
   @bt_port "/dev/rfcomm0"
 
+  @tick_interval 500
   @update_interval 500
-  @first_connect_delay 1_000
-
-  @send_tick_delay 1000
-  @send_try_connect_delay 1000
-  @send_verify_connection_delay 5000
+  @reconnect_interval :timer.seconds(1)
+  @read_timeout :timer.seconds(1)
 
   def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
   @impl true
   def init(_) do
-    {:ok, uart_pid} = Circuits.UART.start_link()
-
-    Circuits.UART.configure(uart_pid,
-      framing: {DashElixirFlutter.SizeFraming, max_length: 32000},
-      active: true
-    )
-
-    ina219_state = AuxFuncs.initialize_ina219()
-    AuxFuncs.bind_rfcomm()
-
-    Process.send_after(self(), :try_connect, @first_connect_delay)
     :timer.send_interval(@update_interval, :update_stream)
 
     {:ok,
      %{
        config: %{
-         uart_pid: uart_pid,
-         ina219: ina219_state,
-         ref_timer: nil,
-         request_state: nil
+         uart_pid: nil,
+         ina219: AuxFuncs.initialize_ina219()
        },
        ecu_data: %EcuData{
          map_kpa: 0,
@@ -55,11 +40,11 @@ defmodule DashElixirFlutter.Serial do
          tps: 0,
          connected: false
        }
-     }}
+     }, {:continue, :connect}}
   end
 
   @impl true
-  def handle_info(:try_connect, %{config: %{uart_pid: uart_pid}} = state) do
+  def handle_continue(:connect, state) do
     serial_port =
       cond do
         File.exists?(@bt_port) -> @bt_port
@@ -67,78 +52,64 @@ defmodule DashElixirFlutter.Serial do
         true -> nil
       end
 
-    case Circuits.UART.open(uart_pid, serial_port, speed: 115_200, active: true) do
-      :ok ->
-        Logger.info("Conexão realizada com sucesso! 🚀")
-        Process.send_after(self(), :tick, @send_tick_delay)
+    with {:ok, uart_pid} <- Circuits.UART.start_link(),
+         :ok <-
+           Circuits.UART.open(uart_pid, serial_port,
+             speed: 115_200,
+             framing: {DashElixirFlutter.SizeFraming, max_length: 32000},
+             active: false
+           ) do
+      Logger.info("UART started successfully! 🚀")
+      schedule_tick()
 
-      {:error, _reason} ->
-        Logger.error("Erro ao realizar conexão! 🙁")
-        Process.send_after(self(), :try_connect, @send_try_connect_delay)
-    end
-
-    {:noreply, state}
-  end
-
-  def handle_info(:tick, state) do
-    # Limpar o buffer antes de cada envio
-    Circuits.UART.flush(state.config.uart_pid, :both)
-    # Comando 'A' para solicitar dados em tempo real
-    Circuits.UART.write(state.config.uart_pid, <<?A>>)
-    Process.send_after(self(), :verify_connection, @send_verify_connection_delay)
-
-    {:noreply, %{state | config: %{state.config | request_state: :sent}}}
-  end
-
-  def handle_info(:verify_connection, state) do
-    case state.config.request_state do
-      :sent ->
-        Logger.error("Conexão deu timeout! 🙁")
-
-        Circuits.UART.flush(state.config.uart_pid, :both)
-        Circuits.UART.close(state.config.uart_pid)
-        Process.send_after(self(), :try_connect, @send_try_connect_delay)
-
-        {:noreply,
-         %{
-           state
-           | config: %{state.config | request_state: :timed_out},
-             ecu_data: %{state.ecu_data | connected: false}
-         }}
-
-      _ ->
+      {:noreply, %{state | config: %{state.config | uart_pid: uart_pid}}}
+    else
+      {:error, reason} ->
+        Logger.error("Failed to start UART: #{reason}")
+        schedule_reconnect()
         {:noreply, state}
     end
   end
 
-  def handle_info({:circuits_uart, _port, data}, state) do
-    case SerialParser.parse_data(data) do
-      {:ok, parsed_data} ->
-        Logger.info("Dados processados com sucesso! 🚀")
-        Process.send_after(self(), :tick, @send_tick_delay)
+  @impl true
+  def handle_info(:reconnect, state) do
+    if state.config.uart_pid do
+      Circuits.UART.flush(state.config.uart_pid, :both)
+      Circuits.UART.close(state.config.uart_pid)
+      Circuits.UART.stop(state.config.uart_pid)
+    end
 
-        {:noreply,
-         %{
-           state
-           | ecu_data: Map.merge(state.ecu_data, parsed_data),
-             config: %{state.config | request_state: :received}
-         }}
+    {:noreply, %{state | config: %{state.config | uart_pid: nil}}, {:continue, :connect}}
+  end
 
-      :error ->
-        case state.config.request_state do
-          :sent ->
-            Logger.error("Erro ao processar dados! 🙁")
-            Process.send_after(self(), :tick, @send_tick_delay)
+  def handle_info(:tick, %{config: %{uart_pid: uart_pid}} = state) when is_nil(uart_pid) do
+    Logger.warning("UART not initialized, skipping tick.")
+    schedule_tick()
+    {:noreply, state}
+  end
 
-            {:noreply,
-             %{
-               state
-               | config: %{state.config | request_state: :received}
-             }}
+  def handle_info(:tick, %{config: %{uart_pid: uart_pid}} = state) do
+    # Limpar o buffer antes de cada envio
+    Circuits.UART.flush(uart_pid, :both)
+    # Comando 'A' para solicitar dados em tempo real
+    Circuits.UART.write(uart_pid, <<?A>>)
 
-          _ ->
-            {:noreply, state}
-        end
+    with {:ok, data} when data != <<>> <- Circuits.UART.read(uart_pid, @read_timeout),
+         {:ok, data} <- SerialParser.parse_data(data) do
+      # Logger.info("Dados recebidos com sucesso! 🚀")
+      schedule_tick()
+
+      {:noreply, %{state | ecu_data: Map.merge(state.ecu_data, data)}}
+    else
+      {:ok, _data} ->
+        Logger.warning("Timeout ao ler dados.")
+        schedule_tick()
+        {:noreply, state}
+
+      {:error, reason} ->
+        Logger.error("Erro ao ler dados: #{reason}")
+        schedule_tick()
+        {:noreply, state}
     end
   end
 
@@ -147,14 +118,20 @@ defmodule DashElixirFlutter.Serial do
         %{config: %{ina219: ina219_state}} = state
       ) do
     if Process.whereis(DashElixirFlutter.StreamServer) do
-      DashElixirFlutter.StreamServer.send_data(
-         %StreamData{
-           ecu_data: state.ecu_data,
-           rpi_info: %RpiInfo{battery_perc: AuxFuncs.get_battery_data(ina219_state)}
-         }
-      )
+      DashElixirFlutter.StreamServer.send_data(%StreamData{
+        ecu_data: state.ecu_data,
+        rpi_info: %RpiInfo{battery_perc: AuxFuncs.get_battery_data(ina219_state)}
+      })
     end
 
     {:noreply, state}
+  end
+
+  defp schedule_reconnect() do
+    Process.send_after(self(), :reconnect, @reconnect_interval)
+  end
+
+  defp schedule_tick() do
+    Process.send_after(self(), :tick, @tick_interval)
   end
 end
