@@ -84,17 +84,17 @@ class EcuDataScreen extends StatelessWidget {
     return Colors.green;
   }
 
-  Icon _getRpiBatteryColorAndIcon(double value) {
-    if (value > 99) return const Icon(Icons.battery_full_rounded, color: Colors.green);
-    if (value > 80) return const Icon(Icons.battery_6_bar_rounded, color: Colors.green);
-    if (value > 70) return const Icon(Icons.battery_5_bar_rounded, color: Colors.blue);
-    if (value > 50) return const Icon(Icons.battery_4_bar_rounded, color: Colors.blue);
-    if (value > 35) return const Icon(Icons.battery_3_bar_rounded, color: Colors.red);
-    if (value > 20) return const Icon(Icons.battery_2_bar_rounded, color: Colors.red);
-    if (value > 10) return const Icon(Icons.battery_1_bar_rounded, color: Colors.red);
+  // Icon _getRpiBatteryColorAndIcon(double value) {
+  //   if (value > 99) return const Icon(Icons.battery_full_rounded, color: Colors.green);
+  //   if (value > 80) return const Icon(Icons.battery_6_bar_rounded, color: Colors.green);
+  //   if (value > 70) return const Icon(Icons.battery_5_bar_rounded, color: Colors.blue);
+  //   if (value > 50) return const Icon(Icons.battery_4_bar_rounded, color: Colors.blue);
+  //   if (value > 35) return const Icon(Icons.battery_3_bar_rounded, color: Colors.red);
+  //   if (value > 20) return const Icon(Icons.battery_2_bar_rounded, color: Colors.red);
+  //   if (value > 10) return const Icon(Icons.battery_1_bar_rounded, color: Colors.red);
 
-    return const Icon(Icons.battery_0_bar_rounded, color: Colors.red);
-  }
+  //   return const Icon(Icons.battery_0_bar_rounded, color: Colors.red);
+  // }
 
   Icon _getRpiConnectionColorAndIcon(bool value) {
     return value
@@ -116,7 +116,7 @@ class EcuDataScreen extends StatelessWidget {
 
     data ??= StreamData();
     var ecuData = data.ecuData;
-    var rpiInfo = data.rpiInfo;
+    // var rpiInfo = data.rpiInfo;
 
     return Row(
       children: [
@@ -188,17 +188,17 @@ class EcuDataScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            _getRpiBatteryColorAndIcon(rpiInfo.batteryPerc),
-                            const SizedBox(width: 8),
-                            Text(
-                              "${rpiInfo.batteryPerc.toInt()} %",
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
+                        // Wrap(
+                        //   crossAxisAlignment: WrapCrossAlignment.center,
+                        //   children: [
+                        //     _getRpiBatteryColorAndIcon(rpiInfo.batteryPerc),
+                        //     const SizedBox(width: 8),
+                        //     Text(
+                        //       "${rpiInfo.batteryPerc.toInt()} %",
+                        //       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        //     ),
+                        //   ],
+                        // ),
                         _getRpiConnectionColorAndIcon(ecuData.connected)
                       ],
                     ),

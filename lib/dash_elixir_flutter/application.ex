@@ -9,11 +9,16 @@ defmodule DashElixirFlutter.Application do
   def start(_type, _args) do
     children =
       [
-        {GRPC.Server.Supervisor,
-         endpoint: DashElixirFlutter.RPC.Endpoint, port: 50051, start_server: true}
+        {
+          GRPC.Server.Supervisor,
+          endpoint: DashElixirFlutter.RPC.Endpoint, port: 50051, start_server: true
+        }
       ] ++
         children(Nerves.Runtime.mix_target()) ++
-        [DashElixirFlutter.BluetoothInit, DashElixirFlutter.Serial]
+        [
+          DashElixirFlutter.BluetoothInit,
+          DashElixirFlutter.Serial
+        ]
 
     opts = [strategy: :one_for_one, name: DashElixirFlutter.Supervisor]
 
@@ -28,14 +33,16 @@ defmodule DashElixirFlutter.Application do
     # Bit of a hack, but we need to wait for /dev/dri to exists...
     dri_card = get_output_card()
 
-    launch_env = %{
-      "FLUTTER_DRM_DEVICE" => "/dev/dri/#{dri_card}",
-      "GALLIUM_HUD" => "cpu+fps",
-      "GALLIUM_HUD_PERIOD" => "0.25",
-      "GALLIUM_HUD_SCALE" => "3",
-      "GALLIUM_HUD_VISIBLE" => "false",
-      "GALLIUM_HUD_TOGGLE_SIGNAL" => "10",
-    } |> Map.merge(NervesTimeZones.tz_environment())
+    launch_env =
+      %{
+        "FLUTTER_DRM_DEVICE" => "/dev/dri/#{dri_card}",
+        "GALLIUM_HUD" => "cpu+fps",
+        "GALLIUM_HUD_PERIOD" => "0.25",
+        "GALLIUM_HUD_SCALE" => "3",
+        "GALLIUM_HUD_VISIBLE" => "false",
+        "GALLIUM_HUD_TOGGLE_SIGNAL" => "10"
+      }
+      |> Map.merge(NervesTimeZones.tz_environment())
 
     [
       NervesFlutterSupport.Flutter.Engine.create_child(

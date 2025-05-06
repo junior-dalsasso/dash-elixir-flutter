@@ -45,7 +45,7 @@ defmodule DashElixirFlutter.MixProject do
       # Serial Deps
       {:circuits_uart, "~> 1.5"},
 
-      # Flutter Example Deps
+      # Flutter Deps
       {:grpc, "~> 0.9"},
       {:protobuf_generate, "~> 0.1.1"},
       {:jason, "~> 1.4.0"}
