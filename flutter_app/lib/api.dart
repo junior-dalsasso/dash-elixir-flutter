@@ -7,6 +7,7 @@ class API {
   static String _baseHostname = "127.0.0.1";
   static ClientChannel? _channel;
   static RPCClient? _client;
+  static late final Stream<StreamData> _broadcastStream;
 
   static updateBaseURI() {
     final env = Platform.environment;
@@ -20,11 +21,11 @@ class API {
         options: const ChannelOptions(credentials: ChannelCredentials.insecure(), idleTimeout: Duration(minutes: 1)));
 
     _client = RPCClient(_channel!, options: CallOptions());
+    _broadcastStream = _client!.streamInfo(Empty()).asBroadcastStream();
   }
 
   static Stream<StreamData> streamData() {
-    final request = Empty();
-    return _client!.streamInfo(request);
+    return _broadcastStream;
   }
 
   static Future<Empty> rebootSystem() async {

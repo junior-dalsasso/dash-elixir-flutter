@@ -1,10 +1,9 @@
 defmodule DashElixirFlutter.Serial do
   use GenServer
 
-  alias DashElixirFlutter.RpiInfo
+  alias DashElixirFlutter.StatusMotor
   alias DashElixirFlutter.StreamData
   alias DashElixirFlutter.EcuData
-  alias DashElixirFlutter.AuxFuncs
   alias DashElixirFlutter.SerialParser
 
   require Logger
@@ -14,8 +13,8 @@ defmodule DashElixirFlutter.Serial do
 
   @tick_interval 500
   @update_interval 500
-  @reconnect_interval :timer.seconds(1)
-  @read_timeout :timer.seconds(1)
+  @reconnect_interval 1000
+  @read_timeout 1000
 
   def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -25,19 +24,61 @@ defmodule DashElixirFlutter.Serial do
 
     {:ok,
      %{
-       config: %{
-         uart_pid: nil,
-         ina219: AuxFuncs.initialize_ina219()
-       },
+       config: %{uart_pid: nil},
        ecu_data: %EcuData{
-         map_kpa: 0,
-         map_bar: 0,
-         map_psi: 0,
-         mat_celsius: 0,
-         battery_voltage: 0,
-         rpm: 0,
-         coolant: 0,
-         tps: 0,
+         segundos_motor_ligado: 0.0,
+         larg_pulso_bancada_1: 0.0,
+         larg_pulso_bancada_2: 0.0,
+         rpm: 0.0,
+         avanco_ignicao: 0.0,
+         status_motor: %StatusMotor{
+           motor_parado: false,
+           motor_em_funcionamento: false,
+           sincronismo_ok: false,
+           aquecendo: false,
+           corte_combustivel_ativo: false,
+           injetando_combustivel: false,
+           ignicao_ativa: false,
+           erro_detectado: false
+         },
+         afr_alvo_bancada_1: 0.0,
+         afr_alvo_bancada_2: 0.0,
+         pressao_coletor: 0.0,
+         temp_ar_coletor: 0.0,
+         temp_agua: 0.0,
+         tps: 0.0,
+         tensao_bateria: 0.0,
+         sonda_banco_1: 0.0,
+         sonda_banco_2: 0.0,
+         correcao_banco_1: 0.0,
+         correcao_banco_2: 0.0,
+         correcao_ar: 0.0,
+         correcao_aquecimento: 0.0,
+         correcao_rapida: 0.0,
+         cutoff_tps: 0.0,
+         correcao_combs_baro: 0.0,
+         correcao_combs_total: 0.0,
+         valor_ve_bancada_1: 0.0,
+         valor_ve_bancada_2: 0.0,
+         controle_marcha_lenta: 0.0,
+         avanco_ignicao_frio: 0.0,
+         tps_variacao: 0.0,
+         map_variacao: 0.0,
+         dwell: 0.0,
+         carga_combustivel: 0.0,
+         atualizacoes_amc: 0,
+         kpaix_nao_usado: 0,
+         leitura_tps_adc: 0.0,
+         carga_combustivel_alg2: 0.0,
+         carga_ignicao_alg1: 0.0,
+         carga_ignicao_alg2: 0.0,
+         contador_sincronismo: 0,
+         erro_tempo_ignicao_pct: 0.0,
+         tempo_entre_pulsos_us: 0,
+         combustivel_parede_us: 0,
+         entrada_analogica_0: 0.0,
+         entrada_analogica_1: 0.0,
+         entrada_analogica_2: 0.0,
          connected: false
        }
      }, {:continue, :connect}}
@@ -113,25 +154,15 @@ defmodule DashElixirFlutter.Serial do
     end
   end
 
-  def handle_info(
-        :update_stream,
-        %{config: %{ina219: ina219_state}} = state
-      ) do
+  def handle_info(:update_stream, state) do
     if Process.whereis(DashElixirFlutter.StreamServer) do
-      DashElixirFlutter.StreamServer.send_data(%StreamData{
-        ecu_data: state.ecu_data,
-        rpi_info: %RpiInfo{battery_perc: AuxFuncs.get_battery_data(ina219_state)}
-      })
+      DashElixirFlutter.StreamServer.send_data(%StreamData{ecu_data: state.ecu_data})
     end
 
     {:noreply, state}
   end
 
-  defp schedule_reconnect() do
-    Process.send_after(self(), :reconnect, @reconnect_interval)
-  end
+  defp schedule_reconnect(), do: Process.send_after(self(), :reconnect, @reconnect_interval)
 
-  defp schedule_tick() do
-    Process.send_after(self(), :tick, @tick_interval)
-  end
+  defp schedule_tick(), do: Process.send_after(self(), :tick, @tick_interval)
 end

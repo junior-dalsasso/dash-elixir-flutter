@@ -11,12 +11,12 @@ defmodule DashElixirFlutter.BluetoothInit do
   @impl true
   def init(_) do
     if Nerves.Runtime.mix_target() != :host do
-      System.cmd("modprobe", ["bluetooth"])
-      System.cmd("modprobe", ["hci_uart"])
+      # System.cmd("modprobe", ["bluetooth"])
+      # System.cmd("modprobe", ["hci_uart"])
       File.rm_rf("/run/messagebus.pid")
       File.mkdir_p!("/run/dbus")
 
-      Process.sleep(3000)
+      # Process.sleep(3000)
 
       Port.open({:spawn_executable, "/usr/bin/dbus-daemon"}, [
         :binary,
@@ -25,13 +25,13 @@ defmodule DashElixirFlutter.BluetoothInit do
         args: ["--system", "--nofork"]
       ])
 
-      Process.sleep(3000)
+      # Process.sleep(3000)
       System.cmd("hciattach", ["/dev/ttyAMA1", "bcm43xx", "921600", "noflow"])
-      Process.sleep(3000)
+      # Process.sleep(3000)
       System.cmd("hciattach", ["/dev/ttyAMA1", "bcm43xx", "921600", "noflow"])
-      Process.sleep(3000)
+      # Process.sleep(3000)
       System.cmd("hciconfig", ["hci0", "up"])
-      Process.sleep(3000)
+      # Process.sleep(3000)
 
       Port.open({:spawn_executable, "/usr/libexec/bluetooth/bluetoothd"}, [
         :binary,
@@ -40,7 +40,7 @@ defmodule DashElixirFlutter.BluetoothInit do
         args: ["--compat", "-n", "-d"]
       ])
 
-      Process.sleep(3000)
+      # Process.sleep(3000)
 
       System.cmd("bluetoothctl", ["power", "on"])
 

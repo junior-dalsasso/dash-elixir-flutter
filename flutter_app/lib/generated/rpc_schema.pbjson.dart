@@ -26,50 +26,127 @@ final $typed_data.Uint8List emptyDescriptor = $convert.base64Decode(
 const EcuData$json = {
   '1': 'EcuData',
   '2': [
-    {'1': 'map_kpa', '3': 1, '4': 1, '5': 2, '10': 'mapKpa'},
-    {'1': 'map_bar', '3': 2, '4': 1, '5': 2, '10': 'mapBar'},
-    {'1': 'map_psi', '3': 3, '4': 1, '5': 2, '10': 'mapPsi'},
-    {'1': 'mat_celsius', '3': 4, '4': 1, '5': 2, '10': 'matCelsius'},
-    {'1': 'battery_voltage', '3': 5, '4': 1, '5': 2, '10': 'batteryVoltage'},
-    {'1': 'rpm', '3': 6, '4': 1, '5': 2, '10': 'rpm'},
-    {'1': 'coolant', '3': 7, '4': 1, '5': 2, '10': 'coolant'},
-    {'1': 'tps', '3': 8, '4': 1, '5': 2, '10': 'tps'},
-    {'1': 'connected', '3': 9, '4': 1, '5': 8, '10': 'connected'},
+    {'1': 'segundos_motor_ligado', '3': 1, '4': 1, '5': 2, '10': 'segundosMotorLigado'},
+    {'1': 'larg_pulso_bancada_1', '3': 2, '4': 1, '5': 2, '10': 'largPulsoBancada1'},
+    {'1': 'larg_pulso_bancada_2', '3': 3, '4': 1, '5': 2, '10': 'largPulsoBancada2'},
+    {'1': 'rpm', '3': 4, '4': 1, '5': 2, '10': 'rpm'},
+    {'1': 'avanco_ignicao', '3': 5, '4': 1, '5': 2, '10': 'avancoIgnicao'},
+    {'1': 'status_motor', '3': 6, '4': 1, '5': 11, '6': '.DashElixirFlutter.StatusMotor', '10': 'statusMotor'},
+    {'1': 'afr_alvo_bancada_1', '3': 7, '4': 1, '5': 2, '10': 'afrAlvoBancada1'},
+    {'1': 'afr_alvo_bancada_2', '3': 8, '4': 1, '5': 2, '10': 'afrAlvoBancada2'},
+    {'1': 'pressao_coletor', '3': 9, '4': 1, '5': 2, '10': 'pressaoColetor'},
+    {'1': 'temp_ar_coletor', '3': 10, '4': 1, '5': 2, '10': 'tempArColetor'},
+    {'1': 'temp_agua', '3': 11, '4': 1, '5': 2, '10': 'tempAgua'},
+    {'1': 'tps', '3': 12, '4': 1, '5': 2, '10': 'tps'},
+    {'1': 'tensao_bateria', '3': 13, '4': 1, '5': 2, '10': 'tensaoBateria'},
+    {'1': 'sonda_banco_1', '3': 14, '4': 1, '5': 2, '10': 'sondaBanco1'},
+    {'1': 'sonda_banco_2', '3': 15, '4': 1, '5': 2, '10': 'sondaBanco2'},
+    {'1': 'correcao_banco_1', '3': 16, '4': 1, '5': 2, '10': 'correcaoBanco1'},
+    {'1': 'correcao_banco_2', '3': 17, '4': 1, '5': 2, '10': 'correcaoBanco2'},
+    {'1': 'correcao_ar', '3': 18, '4': 1, '5': 2, '10': 'correcaoAr'},
+    {'1': 'correcao_aquecimento', '3': 19, '4': 1, '5': 2, '10': 'correcaoAquecimento'},
+    {'1': 'correcao_rapida', '3': 20, '4': 1, '5': 2, '10': 'correcaoRapida'},
+    {'1': 'cutoff_tps', '3': 21, '4': 1, '5': 2, '10': 'cutoffTps'},
+    {'1': 'correcao_combs_baro', '3': 22, '4': 1, '5': 2, '10': 'correcaoCombsBaro'},
+    {'1': 'correcao_combs_total', '3': 23, '4': 1, '5': 2, '10': 'correcaoCombsTotal'},
+    {'1': 'valor_ve_bancada_1', '3': 24, '4': 1, '5': 2, '10': 'valorVeBancada1'},
+    {'1': 'valor_ve_bancada_2', '3': 25, '4': 1, '5': 2, '10': 'valorVeBancada2'},
+    {'1': 'controle_marcha_lenta', '3': 26, '4': 1, '5': 2, '10': 'controleMarchaLenta'},
+    {'1': 'avanco_ignicao_frio', '3': 27, '4': 1, '5': 2, '10': 'avancoIgnicaoFrio'},
+    {'1': 'tps_variacao', '3': 28, '4': 1, '5': 2, '10': 'tpsVariacao'},
+    {'1': 'map_variacao', '3': 29, '4': 1, '5': 2, '10': 'mapVariacao'},
+    {'1': 'dwell', '3': 30, '4': 1, '5': 2, '10': 'dwell'},
+    {'1': 'carga_combustivel', '3': 31, '4': 1, '5': 2, '10': 'cargaCombustivel'},
+    {'1': 'atualizacoes_amc', '3': 32, '4': 1, '5': 13, '10': 'atualizacoesAmc'},
+    {'1': 'kpaix_nao_usado', '3': 33, '4': 1, '5': 13, '10': 'kpaixNaoUsado'},
+    {'1': 'leitura_tps_adc', '3': 34, '4': 1, '5': 2, '10': 'leituraTpsAdc'},
+    {'1': 'carga_combustivel_alg2', '3': 35, '4': 1, '5': 2, '10': 'cargaCombustivelAlg2'},
+    {'1': 'carga_ignicao_alg1', '3': 36, '4': 1, '5': 2, '10': 'cargaIgnicaoAlg1'},
+    {'1': 'carga_ignicao_alg2', '3': 37, '4': 1, '5': 2, '10': 'cargaIgnicaoAlg2'},
+    {'1': 'contador_sincronismo', '3': 38, '4': 1, '5': 13, '10': 'contadorSincronismo'},
+    {'1': 'erro_tempo_ignicao_pct', '3': 39, '4': 1, '5': 2, '10': 'erroTempoIgnicaoPct'},
+    {'1': 'tempo_entre_pulsos_us', '3': 40, '4': 1, '5': 13, '10': 'tempoEntrePulsosUs'},
+    {'1': 'combustivel_parede_us', '3': 41, '4': 1, '5': 13, '10': 'combustivelParedeUs'},
+    {'1': 'entrada_analogica_0', '3': 42, '4': 1, '5': 2, '10': 'entradaAnalogica0'},
+    {'1': 'entrada_analogica_1', '3': 43, '4': 1, '5': 2, '10': 'entradaAnalogica1'},
+    {'1': 'entrada_analogica_2', '3': 44, '4': 1, '5': 2, '10': 'entradaAnalogica2'},
+    {'1': 'connected', '3': 45, '4': 1, '5': 8, '10': 'connected'},
   ],
 };
 
 /// Descriptor for `EcuData`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List ecuDataDescriptor = $convert.base64Decode(
-    'CgdFY3VEYXRhEhcKB21hcF9rcGEYASABKAJSBm1hcEtwYRIXCgdtYXBfYmFyGAIgASgCUgZtYX'
-    'BCYXISFwoHbWFwX3BzaRgDIAEoAlIGbWFwUHNpEh8KC21hdF9jZWxzaXVzGAQgASgCUgptYXRD'
-    'ZWxzaXVzEicKD2JhdHRlcnlfdm9sdGFnZRgFIAEoAlIOYmF0dGVyeVZvbHRhZ2USEAoDcnBtGA'
-    'YgASgCUgNycG0SGAoHY29vbGFudBgHIAEoAlIHY29vbGFudBIQCgN0cHMYCCABKAJSA3RwcxIc'
-    'Cgljb25uZWN0ZWQYCSABKAhSCWNvbm5lY3RlZA==');
+    'CgdFY3VEYXRhEjIKFXNlZ3VuZG9zX21vdG9yX2xpZ2FkbxgBIAEoAlITc2VndW5kb3NNb3Rvck'
+    'xpZ2FkbxIvChRsYXJnX3B1bHNvX2JhbmNhZGFfMRgCIAEoAlIRbGFyZ1B1bHNvQmFuY2FkYTES'
+    'LwoUbGFyZ19wdWxzb19iYW5jYWRhXzIYAyABKAJSEWxhcmdQdWxzb0JhbmNhZGEyEhAKA3JwbR'
+    'gEIAEoAlIDcnBtEiUKDmF2YW5jb19pZ25pY2FvGAUgASgCUg1hdmFuY29JZ25pY2FvEkEKDHN0'
+    'YXR1c19tb3RvchgGIAEoCzIeLkRhc2hFbGl4aXJGbHV0dGVyLlN0YXR1c01vdG9yUgtzdGF0dX'
+    'NNb3RvchIrChJhZnJfYWx2b19iYW5jYWRhXzEYByABKAJSD2FmckFsdm9CYW5jYWRhMRIrChJh'
+    'ZnJfYWx2b19iYW5jYWRhXzIYCCABKAJSD2FmckFsdm9CYW5jYWRhMhInCg9wcmVzc2FvX2NvbG'
+    'V0b3IYCSABKAJSDnByZXNzYW9Db2xldG9yEiYKD3RlbXBfYXJfY29sZXRvchgKIAEoAlINdGVt'
+    'cEFyQ29sZXRvchIbCgl0ZW1wX2FndWEYCyABKAJSCHRlbXBBZ3VhEhAKA3RwcxgMIAEoAlIDdH'
+    'BzEiUKDnRlbnNhb19iYXRlcmlhGA0gASgCUg10ZW5zYW9CYXRlcmlhEiIKDXNvbmRhX2JhbmNv'
+    'XzEYDiABKAJSC3NvbmRhQmFuY28xEiIKDXNvbmRhX2JhbmNvXzIYDyABKAJSC3NvbmRhQmFuY2'
+    '8yEigKEGNvcnJlY2FvX2JhbmNvXzEYECABKAJSDmNvcnJlY2FvQmFuY28xEigKEGNvcnJlY2Fv'
+    'X2JhbmNvXzIYESABKAJSDmNvcnJlY2FvQmFuY28yEh8KC2NvcnJlY2FvX2FyGBIgASgCUgpjb3'
+    'JyZWNhb0FyEjEKFGNvcnJlY2FvX2FxdWVjaW1lbnRvGBMgASgCUhNjb3JyZWNhb0FxdWVjaW1l'
+    'bnRvEicKD2NvcnJlY2FvX3JhcGlkYRgUIAEoAlIOY29ycmVjYW9SYXBpZGESHQoKY3V0b2ZmX3'
+    'RwcxgVIAEoAlIJY3V0b2ZmVHBzEi4KE2NvcnJlY2FvX2NvbWJzX2Jhcm8YFiABKAJSEWNvcnJl'
+    'Y2FvQ29tYnNCYXJvEjAKFGNvcnJlY2FvX2NvbWJzX3RvdGFsGBcgASgCUhJjb3JyZWNhb0NvbW'
+    'JzVG90YWwSKwoSdmFsb3JfdmVfYmFuY2FkYV8xGBggASgCUg92YWxvclZlQmFuY2FkYTESKwoS'
+    'dmFsb3JfdmVfYmFuY2FkYV8yGBkgASgCUg92YWxvclZlQmFuY2FkYTISMgoVY29udHJvbGVfbW'
+    'FyY2hhX2xlbnRhGBogASgCUhNjb250cm9sZU1hcmNoYUxlbnRhEi4KE2F2YW5jb19pZ25pY2Fv'
+    'X2ZyaW8YGyABKAJSEWF2YW5jb0lnbmljYW9GcmlvEiEKDHRwc192YXJpYWNhbxgcIAEoAlILdH'
+    'BzVmFyaWFjYW8SIQoMbWFwX3ZhcmlhY2FvGB0gASgCUgttYXBWYXJpYWNhbxIUCgVkd2VsbBge'
+    'IAEoAlIFZHdlbGwSKwoRY2FyZ2FfY29tYnVzdGl2ZWwYHyABKAJSEGNhcmdhQ29tYnVzdGl2ZW'
+    'wSKQoQYXR1YWxpemFjb2VzX2FtYxggIAEoDVIPYXR1YWxpemFjb2VzQW1jEiYKD2twYWl4X25h'
+    'b191c2FkbxghIAEoDVINa3BhaXhOYW9Vc2FkbxImCg9sZWl0dXJhX3Rwc19hZGMYIiABKAJSDW'
+    'xlaXR1cmFUcHNBZGMSNAoWY2FyZ2FfY29tYnVzdGl2ZWxfYWxnMhgjIAEoAlIUY2FyZ2FDb21i'
+    'dXN0aXZlbEFsZzISLAoSY2FyZ2FfaWduaWNhb19hbGcxGCQgASgCUhBjYXJnYUlnbmljYW9BbG'
+    'cxEiwKEmNhcmdhX2lnbmljYW9fYWxnMhglIAEoAlIQY2FyZ2FJZ25pY2FvQWxnMhIxChRjb250'
+    'YWRvcl9zaW5jcm9uaXNtbxgmIAEoDVITY29udGFkb3JTaW5jcm9uaXNtbxIzChZlcnJvX3RlbX'
+    'BvX2lnbmljYW9fcGN0GCcgASgCUhNlcnJvVGVtcG9JZ25pY2FvUGN0EjEKFXRlbXBvX2VudHJl'
+    'X3B1bHNvc191cxgoIAEoDVISdGVtcG9FbnRyZVB1bHNvc1VzEjIKFWNvbWJ1c3RpdmVsX3Bhcm'
+    'VkZV91cxgpIAEoDVITY29tYnVzdGl2ZWxQYXJlZGVVcxIuChNlbnRyYWRhX2FuYWxvZ2ljYV8w'
+    'GCogASgCUhFlbnRyYWRhQW5hbG9naWNhMBIuChNlbnRyYWRhX2FuYWxvZ2ljYV8xGCsgASgCUh'
+    'FlbnRyYWRhQW5hbG9naWNhMRIuChNlbnRyYWRhX2FuYWxvZ2ljYV8yGCwgASgCUhFlbnRyYWRh'
+    'QW5hbG9naWNhMhIcCgljb25uZWN0ZWQYLSABKAhSCWNvbm5lY3RlZA==');
 
-@$core.Deprecated('Use rpiInfoDescriptor instead')
-const RpiInfo$json = {
-  '1': 'RpiInfo',
+@$core.Deprecated('Use statusMotorDescriptor instead')
+const StatusMotor$json = {
+  '1': 'StatusMotor',
   '2': [
-    {'1': 'battery_perc', '3': 1, '4': 1, '5': 2, '10': 'batteryPerc'},
+    {'1': 'motor_parado', '3': 1, '4': 1, '5': 8, '10': 'motorParado'},
+    {'1': 'motor_em_funcionamento', '3': 2, '4': 1, '5': 8, '10': 'motorEmFuncionamento'},
+    {'1': 'sincronismo_ok', '3': 3, '4': 1, '5': 8, '10': 'sincronismoOk'},
+    {'1': 'aquecendo', '3': 4, '4': 1, '5': 8, '10': 'aquecendo'},
+    {'1': 'corte_combustivel_ativo', '3': 5, '4': 1, '5': 8, '10': 'corteCombustivelAtivo'},
+    {'1': 'injetando_combustivel', '3': 6, '4': 1, '5': 8, '10': 'injetandoCombustivel'},
+    {'1': 'ignicao_ativa', '3': 7, '4': 1, '5': 8, '10': 'ignicaoAtiva'},
+    {'1': 'erro_detectado', '3': 8, '4': 1, '5': 8, '10': 'erroDetectado'},
   ],
 };
 
-/// Descriptor for `RpiInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List rpiInfoDescriptor = $convert.base64Decode(
-    'CgdScGlJbmZvEiEKDGJhdHRlcnlfcGVyYxgBIAEoAlILYmF0dGVyeVBlcmM=');
+/// Descriptor for `StatusMotor`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List statusMotorDescriptor = $convert.base64Decode(
+    'CgtTdGF0dXNNb3RvchIhCgxtb3Rvcl9wYXJhZG8YASABKAhSC21vdG9yUGFyYWRvEjQKFm1vdG'
+    '9yX2VtX2Z1bmNpb25hbWVudG8YAiABKAhSFG1vdG9yRW1GdW5jaW9uYW1lbnRvEiUKDnNpbmNy'
+    'b25pc21vX29rGAMgASgIUg1zaW5jcm9uaXNtb09rEhwKCWFxdWVjZW5kbxgEIAEoCFIJYXF1ZW'
+    'NlbmRvEjYKF2NvcnRlX2NvbWJ1c3RpdmVsX2F0aXZvGAUgASgIUhVjb3J0ZUNvbWJ1c3RpdmVs'
+    'QXRpdm8SMwoVaW5qZXRhbmRvX2NvbWJ1c3RpdmVsGAYgASgIUhRpbmpldGFuZG9Db21idXN0aX'
+    'ZlbBIjCg1pZ25pY2FvX2F0aXZhGAcgASgIUgxpZ25pY2FvQXRpdmESJQoOZXJyb19kZXRlY3Rh'
+    'ZG8YCCABKAhSDWVycm9EZXRlY3RhZG8=');
 
 @$core.Deprecated('Use streamDataDescriptor instead')
 const StreamData$json = {
   '1': 'StreamData',
   '2': [
     {'1': 'ecu_data', '3': 1, '4': 1, '5': 11, '6': '.DashElixirFlutter.EcuData', '10': 'ecuData'},
-    {'1': 'rpi_info', '3': 2, '4': 1, '5': 11, '6': '.DashElixirFlutter.RpiInfo', '10': 'rpiInfo'},
   ],
 };
 
 /// Descriptor for `StreamData`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List streamDataDescriptor = $convert.base64Decode(
     'CgpTdHJlYW1EYXRhEjUKCGVjdV9kYXRhGAEgASgLMhouRGFzaEVsaXhpckZsdXR0ZXIuRWN1RG'
-    'F0YVIHZWN1RGF0YRI1CghycGlfaW5mbxgCIAEoCzIaLkRhc2hFbGl4aXJGbHV0dGVyLlJwaUlu'
-    'Zm9SB3JwaUluZm8=');
+    'F0YVIHZWN1RGF0YQ==');
 

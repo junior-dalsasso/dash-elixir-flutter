@@ -23,22 +23,64 @@ service RPC {
 
 // EcuData Info Structures
 message EcuData {
-  float map_kpa = 1;
-  float map_bar = 2;
-  float map_psi = 3;
-  float mat_celsius = 4;
-  float battery_voltage = 5;
-  float rpm = 6;
-  float coolant = 7;
-  float tps = 8;
-  bool connected = 9;
+  float segundos_motor_ligado = 1;
+  float larg_pulso_bancada_1 = 2;
+  float larg_pulso_bancada_2 = 3;
+  float rpm = 4;
+  float avanco_ignicao = 5;
+  StatusMotor status_motor = 6;
+  float afr_alvo_bancada_1 = 7;
+  float afr_alvo_bancada_2 = 8;
+  float pressao_coletor = 9;
+  float temp_ar_coletor = 10;
+  float temp_agua = 11;
+  float tps = 12;
+  float tensao_bateria = 13;
+  float sonda_banco_1 = 14;
+  float sonda_banco_2 = 15;
+  float correcao_banco_1 = 16;
+  float correcao_banco_2 = 17;
+  float correcao_ar = 18;
+  float correcao_aquecimento = 19;
+  float correcao_rapida = 20;
+  float cutoff_tps = 21;
+  float correcao_combs_baro = 22;
+  float correcao_combs_total = 23;
+  float valor_ve_bancada_1 = 24;
+  float valor_ve_bancada_2 = 25;
+  float controle_marcha_lenta = 26;
+  float avanco_ignicao_frio = 27;
+  float tps_variacao = 28;
+  float map_variacao = 29;
+  float dwell = 30;
+  float carga_combustivel = 31;
+  uint32 atualizacoes_amc = 32;
+  uint32 kpaix_nao_usado = 33;
+  float leitura_tps_adc = 34;
+  float carga_combustivel_alg2 = 35;
+  float carga_ignicao_alg1 = 36;
+  float carga_ignicao_alg2 = 37;
+  uint32 contador_sincronismo = 38;
+  float erro_tempo_ignicao_pct = 39;
+  uint32 tempo_entre_pulsos_us = 40;
+  uint32 combustivel_parede_us = 41;
+  float entrada_analogica_0 = 42;
+  float entrada_analogica_1 = 43;
+  float entrada_analogica_2 = 44;
+  bool connected = 45;
 }
 
-message RpiInfo {
-  float battery_perc = 1;
+message StatusMotor {
+  bool motor_parado = 1;
+  bool motor_em_funcionamento = 2;
+  bool sincronismo_ok = 3;
+  bool aquecendo = 4;
+  bool corte_combustivel_ativo = 5;
+  bool injetando_combustivel = 6;
+  bool ignicao_ativa = 7;
+  bool erro_detectado = 8;
 }
 
 message StreamData {
   EcuData ecu_data = 1;
-  RpiInfo rpi_info = 2;
 }
