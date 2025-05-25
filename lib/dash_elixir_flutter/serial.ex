@@ -88,8 +88,8 @@ defmodule DashElixirFlutter.Serial do
   def handle_continue(:connect, state) do
     serial_port =
       cond do
-        File.exists?(@bt_port) -> @bt_port
         File.exists?(@usb_port) -> @usb_port
+        File.exists?(@bt_port) -> @bt_port
         true -> nil
       end
 

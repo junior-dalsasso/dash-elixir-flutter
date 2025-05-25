@@ -150,3 +150,41 @@ final $typed_data.Uint8List streamDataDescriptor = $convert.base64Decode(
     'CgpTdHJlYW1EYXRhEjUKCGVjdV9kYXRhGAEgASgLMhouRGFzaEVsaXhpckZsdXR0ZXIuRWN1RG'
     'F0YVIHZWN1RGF0YQ==');
 
+@$core.Deprecated('Use deviceDescriptor instead')
+const Device$json = {
+  '1': 'Device',
+  '2': [
+    {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'address', '3': 2, '4': 1, '5': 9, '10': 'address'},
+  ],
+};
+
+/// Descriptor for `Device`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deviceDescriptor = $convert.base64Decode(
+    'CgZEZXZpY2USEgoEbmFtZRgBIAEoCVIEbmFtZRIYCgdhZGRyZXNzGAIgASgJUgdhZGRyZXNz');
+
+@$core.Deprecated('Use deviceListDescriptor instead')
+const DeviceList$json = {
+  '1': 'DeviceList',
+  '2': [
+    {'1': 'devices', '3': 1, '4': 3, '5': 11, '6': '.DashElixirFlutter.Device', '10': 'devices'},
+  ],
+};
+
+/// Descriptor for `DeviceList`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deviceListDescriptor = $convert.base64Decode(
+    'CgpEZXZpY2VMaXN0EjMKB2RldmljZXMYASADKAsyGS5EYXNoRWxpeGlyRmx1dHRlci5EZXZpY2'
+    'VSB2RldmljZXM=');
+
+@$core.Deprecated('Use actionResultDescriptor instead')
+const ActionResult$json = {
+  '1': 'ActionResult',
+  '2': [
+    {'1': 'result', '3': 1, '4': 1, '5': 8, '10': 'result'},
+  ],
+};
+
+/// Descriptor for `ActionResult`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List actionResultDescriptor = $convert.base64Decode(
+    'CgxBY3Rpb25SZXN1bHQSFgoGcmVzdWx0GAEgASgIUgZyZXN1bHQ=');
+

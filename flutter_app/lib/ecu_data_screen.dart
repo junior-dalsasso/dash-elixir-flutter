@@ -23,41 +23,13 @@ class EcuDataScreen extends StatelessWidget {
             body: StreamBuilder<StreamData>(
               stream: API.streamData(),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // return const Center(child: CircularProgressIndicator());
-                }
-
                 if (snapshot.hasError) return const Center(child: Text("Erro na conexão"));
-
                 return _buildPage(snapshot.data, context);
               },
             ),
           ),
         ),
       ],
-    );
-  }
-
-  void showRebootConfirm(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Deseja reiniciar o dispositivo?"),
-          actions: [
-            TextButton(
-              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
-              child: const Text("Cancelar"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
-              child: const Text("Sim"),
-              onPressed: () => API.rebootSystem(),
-            )
-          ],
-        );
-      },
     );
   }
 

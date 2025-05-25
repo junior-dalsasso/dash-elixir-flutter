@@ -21,4 +21,16 @@ defmodule DashElixirFlutter.RPC.Server do
   def reboot_system(_request, _stream) do
     Nerves.Runtime.reboot()
   end
+
+  @spec list_bluetooth_devices(DashElixirFlutter.Empty.t(), GRPC.Server.Stream.t()) :: DashElixirFlutter.DeviceList.t()
+  def list_bluetooth_devices(_request, _stream) do
+    devices = DashElixirFlutter.BluetoothInit.list_devices()
+    %DashElixirFlutter.DeviceList{devices: devices}
+  end
+
+  @spec try_connect_device(DashElixirFlutter.Device.t(), GRPC.Server.Stream.t()) :: DashElixirFlutter.ActionResult.t()
+  def try_connect_device(device, _stream) do
+    DashElixirFlutter.BluetoothInit.try_connect_device(device.address)
+    %DashElixirFlutter.ActionResult{result: true}
+  end
 end

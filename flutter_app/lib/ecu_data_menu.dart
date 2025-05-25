@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api.dart';
 import 'package:flutter_app/generated/rpc_schema.pbgrpc.dart';
+import 'package:flutter_app/rpi_connection_btn.dart';
 import 'package:intl/intl.dart';
 
 class EcuDataMenu extends StatelessWidget {
@@ -56,12 +57,6 @@ class EcuDataMenu extends StatelessWidget {
     if (value > 80) return Colors.red;
     if (value > 40) return Colors.blue;
     return Colors.green;
-  }
-
-  Icon _getRpiConnectionColorAndIcon(bool value) {
-    return value
-        ? const Icon(Icons.bluetooth_connected, color: Colors.green, size: 32)
-        : const Icon(Icons.bluetooth_disabled, color: Colors.red, size: 32);
   }
 
   String getMotorStatus() {
@@ -159,7 +154,7 @@ class EcuDataMenu extends StatelessWidget {
                       DateFormat("HH:mm:ss").format(now),
                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                     ),
-                    _getRpiConnectionColorAndIcon(ecuData.connected)
+                    RpiConnectionBtn(isConnected: ecuData.connected, context: context)
                   ],
                 ),
                 Text(
@@ -235,7 +230,6 @@ class EcuDataMenu extends StatelessWidget {
                   onPressed: () {
                     showModalBottomSheet<void>(
                       context: context,
-                      backgroundColor: Colors.grey[900],
                       isScrollControlled: true,
                       builder: (BuildContext context) {
                         return StreamBuilder<StreamData>(

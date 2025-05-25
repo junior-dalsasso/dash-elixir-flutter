@@ -29,6 +29,14 @@ class RPCClient extends $grpc.Client {
       '/DashElixirFlutter.RPC/RebootSystem',
       ($0.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Empty.fromBuffer(value));
+  static final _$listBluetoothDevices = $grpc.ClientMethod<$0.Empty, $0.DeviceList>(
+      '/DashElixirFlutter.RPC/listBluetoothDevices',
+      ($0.Empty value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.DeviceList.fromBuffer(value));
+  static final _$tryConnectDevice = $grpc.ClientMethod<$0.Device, $0.ActionResult>(
+      '/DashElixirFlutter.RPC/tryConnectDevice',
+      ($0.Device value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.ActionResult.fromBuffer(value));
 
   RPCClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -42,6 +50,14 @@ class RPCClient extends $grpc.Client {
 
   $grpc.ResponseFuture<$0.Empty> rebootSystem($0.Empty request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$rebootSystem, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.DeviceList> listBluetoothDevices($0.Empty request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$listBluetoothDevices, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.ActionResult> tryConnectDevice($0.Device request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$tryConnectDevice, request, options: options);
   }
 }
 
@@ -64,6 +80,20 @@ abstract class RPCServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
         ($0.Empty value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.Empty, $0.DeviceList>(
+        'listBluetoothDevices',
+        listBluetoothDevices_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
+        ($0.DeviceList value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.Device, $0.ActionResult>(
+        'tryConnectDevice',
+        tryConnectDevice_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.Device.fromBuffer(value),
+        ($0.ActionResult value) => value.writeToBuffer()));
   }
 
   $async.Stream<$0.StreamData> streamInfo_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async* {
@@ -74,6 +104,16 @@ abstract class RPCServiceBase extends $grpc.Service {
     return rebootSystem(call, await request);
   }
 
+  $async.Future<$0.DeviceList> listBluetoothDevices_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async {
+    return listBluetoothDevices(call, await request);
+  }
+
+  $async.Future<$0.ActionResult> tryConnectDevice_Pre($grpc.ServiceCall call, $async.Future<$0.Device> request) async {
+    return tryConnectDevice(call, await request);
+  }
+
   $async.Stream<$0.StreamData> streamInfo($grpc.ServiceCall call, $0.Empty request);
   $async.Future<$0.Empty> rebootSystem($grpc.ServiceCall call, $0.Empty request);
+  $async.Future<$0.DeviceList> listBluetoothDevices($grpc.ServiceCall call, $0.Empty request);
+  $async.Future<$0.ActionResult> tryConnectDevice($grpc.ServiceCall call, $0.Device request);
 }

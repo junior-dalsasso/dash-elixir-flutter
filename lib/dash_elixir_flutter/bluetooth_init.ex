@@ -3,7 +3,8 @@ defmodule DashElixirFlutter.BluetoothInit do
 
   require Logger
 
-  @bluetooth_mac "98:D3:71:F6:E7:82"
+  @bluetooth_storage "/data/bluetooth"
+  @last_connected_file Path.join(@bluetooth_storage, "last_connected")
 
   def start_link(opts \\ []),
     do: GenServer.start_link(__MODULE__, opts, name: __MODULE__, timeout: :infinity)
@@ -11,12 +12,11 @@ defmodule DashElixirFlutter.BluetoothInit do
   @impl true
   def init(_) do
     if Nerves.Runtime.mix_target() != :host do
-      # System.cmd("modprobe", ["bluetooth"])
-      # System.cmd("modprobe", ["hci_uart"])
+      System.cmd("mount", ["-t", "tmpfs", "-o", "size=1M", "tmpfs", "/var"])
+      System.cmd("mkdir", ["-p", "/var/lib/bluetooth"])
+
       File.rm_rf("/run/messagebus.pid")
       File.mkdir_p!("/run/dbus")
-
-      # Process.sleep(3000)
 
       Port.open({:spawn_executable, "/usr/bin/dbus-daemon"}, [
         :binary,
@@ -25,13 +25,9 @@ defmodule DashElixirFlutter.BluetoothInit do
         args: ["--system", "--nofork"]
       ])
 
-      # Process.sleep(3000)
       System.cmd("hciattach", ["/dev/ttyAMA1", "bcm43xx", "921600", "noflow"])
-      # Process.sleep(3000)
       System.cmd("hciattach", ["/dev/ttyAMA1", "bcm43xx", "921600", "noflow"])
-      # Process.sleep(3000)
       System.cmd("hciconfig", ["hci0", "up"])
-      # Process.sleep(3000)
 
       Port.open({:spawn_executable, "/usr/libexec/bluetooth/bluetoothd"}, [
         :binary,
@@ -40,16 +36,69 @@ defmodule DashElixirFlutter.BluetoothInit do
         args: ["--compat", "-n", "-d"]
       ])
 
-      # Process.sleep(3000)
-
       System.cmd("bluetoothctl", ["power", "on"])
 
-      System.cmd("rfcomm", ["release", "0"])
-      System.cmd("rfcomm", ["bind", "0", @bluetooth_mac])
+      address = get_last_connected_device()
+
+      if address do
+        try_connect_device(address)
+      end
 
       Logger.warning("BT ligado com sucesso! 🚀")
     end
 
     :ignore
+  end
+
+  def try_connect_device(address) do
+    File.mkdir_p!(@bluetooth_storage)
+
+    System.cmd("rfcomm", ["release", "0"])
+
+    case System.cmd("rfcomm", ["bind", "0", address]) do
+      {_, 0} ->
+        File.write!(@last_connected_file, address)
+        :ok
+
+      _ ->
+        :error
+    end
+  end
+
+  def get_last_connected_device() do
+    if File.exists?(@last_connected_file) do
+      File.read!(@last_connected_file)
+    else
+      nil
+    end
+  end
+
+  def list_devices() do
+    case System.cmd("hcitool", ["scan"]) do
+      {output, 0} ->
+        parse_scan_output(output)
+
+      {error, _} ->
+        IO.warn("Bluetooth scan failed: #{error}")
+        []
+    end
+  end
+
+  defp parse_scan_output(output) do
+    lines = String.split(output, "\n")
+
+    lines
+    |> Enum.drop(1)
+    |> Enum.drop(-1)
+    |> Enum.map(&String.trim/1)
+    |> Enum.map(&parse_device_line/1)
+    |> Enum.filter(& &1)
+  end
+
+  defp parse_device_line(line) do
+    case String.split(line, ["\t"], trim: true) do
+      [address, name] -> %{address: address, name: name}
+      _ -> nil
+    end
   end
 end

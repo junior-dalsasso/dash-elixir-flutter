@@ -31,4 +31,12 @@ class API {
   static Future<Empty> rebootSystem() async {
     return await _client!.rebootSystem(Empty.create());
   }
+
+  static Future<DeviceList> listBluetoothDevices() async {
+    return await _client!.listBluetoothDevices(Empty.create());
+  }
+
+  static Future<ActionResult> connectDevice(Device device) async {
+    return await _client!.tryConnectDevice(device);
+  }
 }

@@ -75,6 +75,28 @@ defmodule DashElixirFlutter.StreamData do
   field :ecu_data, 1, type: DashElixirFlutter.EcuData, json_name: "ecuData"
 end
 
+defmodule DashElixirFlutter.Device do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  field :name, 1, type: :string
+  field :address, 2, type: :string
+end
+
+defmodule DashElixirFlutter.DeviceList do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  field :devices, 1, repeated: true, type: DashElixirFlutter.Device
+end
+
+defmodule DashElixirFlutter.ActionResult do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  field :result, 1, type: :bool
+end
+
 defmodule DashElixirFlutter.RPC.Service do
   @moduledoc false
 
@@ -103,6 +125,34 @@ defmodule DashElixirFlutter.RPC.Service do
         additional_bindings: [],
         response_body: "",
         pattern: {:get, "/rebootSystem"},
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:listBluetoothDevices, DashElixirFlutter.Empty, DashElixirFlutter.DeviceList, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/listBluetoothDevices"},
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:tryConnectDevice, DashElixirFlutter.Device, DashElixirFlutter.ActionResult, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/tryConnectDevice"},
         __unknown_fields__: []
       }
     }
