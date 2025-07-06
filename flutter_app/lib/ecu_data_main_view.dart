@@ -54,7 +54,7 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     for (int column = row * 2 + 1; column <= row * 2 + 2; column++)
-                      _buildRadialGauge(chartConfigs: chartConfigs[column]!, context: context, chartId: column)
+                      _buildGauge(chartConfigs: chartConfigs[column]!, context: context, chartId: column)
                   ],
                 ),
             ],
@@ -65,17 +65,26 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
     );
   }
 
-  Widget _buildRadialGauge({
+  Widget _buildGauge({
     required ChartConfig chartConfigs,
     required BuildContext context,
     required int chartId,
   }) {
+    if (chartConfigs.chartType == "RADIAL") {
+      return _buildRadialGauge(chartConfigs: chartConfigs, context: context, chartId: chartId);
+    } else {
+      return _buildMinMaxGauge(chartConfigs: chartConfigs, context: context, chartId: chartId);
+    }
+  }
+
+  Widget _buildRadialGauge({required ChartConfig chartConfigs, required BuildContext context, required int chartId}) {
     double value = widget.ecuData.getField(widget.ecuData.getTagNumber(chartConfigs.metricId) ?? 1);
     List<GaugeAnnotation> annotations = [];
-    double minValue = chartConfigs.minValue;
-    if (minValue > chartConfigs.maxValue) minValue = chartConfigs.maxValue - 1;
+    double minValue = chartConfigs.minValue ?? 0;
+    double maxValue = chartConfigs.maxValue ?? 0;
+    if (minValue > maxValue) minValue = maxValue - 1;
 
-    for (double i = minValue; i <= chartConfigs.maxValue; i += chartConfigs.valueInterval) {
+    for (double i = minValue; i <= maxValue; i += chartConfigs.valueInterval) {
       final decimalFixed = chartConfigs.decimalPlaces > 2 ? 2 : chartConfigs.decimalPlaces;
 
       annotations.add(
@@ -84,7 +93,7 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
             i.toStringAsFixed(decimalFixed == 1 ? 0 : decimalFixed),
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
           ),
-          angle: ((i - minValue) / (chartConfigs.maxValue - minValue) * 276) - 228,
+          angle: ((i - minValue) / (maxValue - minValue) * 276) - 228,
           positionFactor: 0.75,
         ),
       );
@@ -100,7 +109,7 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
               axes: <RadialAxis>[
                 RadialAxis(
                   minimum: minValue,
-                  maximum: chartConfigs.maxValue,
+                  maximum: maxValue,
                   interval: chartConfigs.valueInterval,
                   showLabels: false,
                   axisLineStyle: const AxisLineStyle(
@@ -160,7 +169,7 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
                   ranges: <GaugeRange>[
                     GaugeRange(
                       startValue: minValue,
-                      endValue: chartConfigs.maxValue,
+                      endValue: maxValue,
                       sizeUnit: GaugeSizeUnit.factor,
                       startWidth: 0.03,
                       endWidth: 0.03,
@@ -172,6 +181,88 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
                   ],
                 ),
               ],
+            ),
+          ),
+          Positioned(
+            left: chartId.isOdd ? 0 : null,
+            right: chartId.isEven ? 0 : null,
+            child: IconButton(
+              icon: const Icon(Icons.settings),
+              iconSize: 24,
+              onPressed: () => _showChartSettings(context, chartId, chartConfigs),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMinMaxGauge({required ChartConfig chartConfigs, required BuildContext context, required int chartId}) {
+    double value = widget.ecuData.getField(widget.ecuData.getTagNumber(chartConfigs.metricId) ?? 1);
+    final int decimalPlaces = chartConfigs.decimalPlaces > 2 ? 2 : chartConfigs.decimalPlaces;
+
+    bool changed = false;
+
+    if (widget.ecuData.connected) {
+      if (chartConfigs.maxValue == null || value > chartConfigs.maxValue!) {
+        chartConfigs.maxValue = value;
+        changed = true;
+      }
+
+      if (chartConfigs.minValue == null || value < chartConfigs.minValue!) {
+        chartConfigs.minValue = value;
+        changed = true;
+      }
+
+      if (changed) {
+        final configs = widget.preferencesService.getChartConfigs();
+        configs[chartId] = chartConfigs;
+        widget.preferencesService.saveChartConfigs(configs);
+      }
+    }
+
+    String formattedValue(double val) => "${val.toStringAsFixed(decimalPlaces)} ${chartConfigs.unit}";
+
+    return RepaintBoundary(
+      child: Stack(
+        children: [
+          SizedBox(
+            width: widget.gaugeSize,
+            height: widget.gaugeSize,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  formattedValue(chartConfigs.maxValue ?? 0),
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(fontSize: 32, color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  formattedValue(value),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 46, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  formattedValue(chartConfigs.minValue ?? 0),
+                  style: const TextStyle(fontSize: 32, color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  chartConfigs.metricName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            left: chartId.isOdd ? 46 : null,
+            right: chartId.isEven ? 46 : null,
+            child: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              iconSize: 24,
+              onPressed: () => _restartMinMaxGauge(chartId, chartConfigs),
             ),
           ),
           Positioned(
@@ -201,5 +292,14 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
         );
       },
     );
+  }
+
+  void _restartMinMaxGauge(int chartId, ChartConfig chartConfigs) {
+    chartConfigs.maxValue = null;
+    chartConfigs.minValue = null;
+
+    final configs = widget.preferencesService.getChartConfigs();
+    configs[chartId] = chartConfigs;
+    widget.preferencesService.saveChartConfigs(configs);
   }
 }

@@ -72,6 +72,7 @@ class PreferencesService {
   Map<int, ChartConfig> getDefaultConfigs() {
     return {
       1: ChartConfig(
+        chartType: "RADIAL",
         metricName: "Pressão coletor",
         metricId: "pressaoColetor",
         minValue: 0,
@@ -81,6 +82,7 @@ class PreferencesService {
         valueInterval: 0.2,
       ),
       2: ChartConfig(
+        chartType: "RADIAL",
         metricName: "Rpm",
         metricId: "rpm",
         minValue: 0,
@@ -89,6 +91,7 @@ class PreferencesService {
         valueInterval: 1,
       ),
       3: ChartConfig(
+        chartType: "RADIAL",
         metricName: "Temp. admissão",
         metricId: "tempArColetor",
         minValue: -10,
@@ -97,6 +100,7 @@ class PreferencesService {
         valueInterval: 10,
       ),
       4: ChartConfig(
+        chartType: "RADIAL",
         metricName: "Tensão",
         metricId: "tensaoBateria",
         minValue: 8,
