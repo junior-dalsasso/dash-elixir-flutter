@@ -60,19 +60,15 @@ class EcuDataMenu extends StatelessWidget {
   }
 
   String getMotorStatus() {
-    if (ecuData.statusMotor.motorEmFuncionamento) return "Em funcionamento";
-    if (ecuData.statusMotor.aquecendo) return "Motor aquecendo";
+    if (ecuData.statusMotor.motorEmPartida) return "Motor em partida";
+    if (ecuData.statusMotor.cicloAquecimento) return "Motor aquecendo";
+    if (ecuData.statusMotor.motorPronto) return "Motor ligado";
 
-    return "Motor parado";
+    return "";
   }
 
   String getMotorActions() {
-    // 'Motor sincronismo Ok': data.statusMotor.sincronismoOk,
-
-    if (ecuData.statusMotor.corteCombustivelAtivo) return "Cut off ativo";
-    if (ecuData.statusMotor.ignicaoAtiva) return "Ignição ativa";
-    if (ecuData.statusMotor.erroDetectado) return "Erro detectado";
-    if (ecuData.statusMotor.injetandoCombustivel) return "Injetando";
+    if (ecuData.largPulsoBancada1 == 0 && ecuData.rpm > 500) return "Cut off ativo";
 
     return "";
   }
@@ -123,14 +119,10 @@ class EcuDataMenu extends StatelessWidget {
       'Entrada analógica 1': data.entradaAnalogica1,
       'Entrada analógica 2': data.entradaAnalogica2,
       // 'connected': data.connected,
-      'Motor parado': data.statusMotor.motorParado,
-      'Motor em funcionamento': data.statusMotor.motorEmFuncionamento,
-      'Motor sincronismo Ok': data.statusMotor.sincronismoOk,
-      'Motor aquecendo': data.statusMotor.aquecendo,
-      'Motor cutOff ativo': data.statusMotor.corteCombustivelAtivo,
-      'Motor injetando combustível': data.statusMotor.injetandoCombustivel,
-      'Motor ignição ativa': data.statusMotor.ignicaoAtiva,
-      'Motor erro detectado': data.statusMotor.erroDetectado,
+      'Motor pronto': data.statusMotor.motorPronto,
+      'Motor dando partida': data.statusMotor.motorEmPartida,
+      'Motor partida com enriquecimento': data.statusMotor.enriquecimentoPartida,
+      'Motor aquecendo': data.statusMotor.cicloAquecimento,
     };
   }
 
@@ -197,20 +189,22 @@ class EcuDataMenu extends StatelessWidget {
                     Icon(Icons.airlines_outlined, color: _getTpsColor(ecuData.tps)),
                     const SizedBox(width: 8),
                     Text(
-                      "${ecuData.tps > 100 ? 100 : ecuData.tps.toInt()} %",
+                      "${ecuData.tps > 200 ? 0 : ecuData.tps.toInt()} %",
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-                Center(
-                  child: Chip(
-                    backgroundColor: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
-                    padding: const EdgeInsets.all(1),
-                    label: Text(getMotorStatus()),
-                    labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
+                getMotorStatus().isNotEmpty
+                    ? Center(
+                        child: Chip(
+                          backgroundColor: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
+                          padding: const EdgeInsets.all(1),
+                          label: Text(getMotorStatus()),
+                          labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    : Container(),
                 const SizedBox(height: 10),
                 getMotorActions().isNotEmpty
                     ? Center(
