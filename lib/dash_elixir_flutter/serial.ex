@@ -11,8 +11,8 @@ defmodule DashElixirFlutter.Serial do
   @usb_port "/dev/ttyUSB0"
   @bt_port "/dev/rfcomm0"
 
-  @tick_interval 500
-  @update_interval 500
+  @tick_interval 50
+  @update_interval 50
   @reconnect_interval 1000
   @read_timeout 1000
 
@@ -32,14 +32,10 @@ defmodule DashElixirFlutter.Serial do
          rpm: 0.0,
          avanco_ignicao: 0.0,
          status_motor: %StatusMotor{
-           motor_parado: false,
-           motor_em_funcionamento: false,
-           sincronismo_ok: false,
-           aquecendo: false,
-           corte_combustivel_ativo: false,
-           injetando_combustivel: false,
-           ignicao_ativa: false,
-           erro_detectado: false
+           motor_pronto: false,
+           motor_em_partida: false,
+           enriquecimento_partida: false,
+           ciclo_aquecimento: false
          },
          afr_alvo_bancada_1: 0.0,
          afr_alvo_bancada_2: 0.0,

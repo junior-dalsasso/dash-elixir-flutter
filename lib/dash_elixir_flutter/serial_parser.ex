@@ -69,45 +69,38 @@ defmodule DashElixirFlutter.SerialParser do
     entrada_analogica_2::16,    # 108-109:  Entrada analógica GPIO 2
     _rest::binary
   >>) do
-    avanco_ignicao_convertido = avanco_ignicao / 10
-    pressao_coletor_convertido = pressao_coletor / 1000
-    temp_ar_coletor_convertido = (temp_ar_coletor / 32) * 5 / 9
-    temp_agua_convertida = (temp_agua / 32) * 5 / 9
-    tensao_bateria_convertida = tensao_bateria / 10
-    avanco_ignicao_frio_convertido = avanco_ignicao_frio / 10
-
     {:ok, %{
       segundos_motor_ligado: segundos_motor_ligado,
-      larg_pulso_bancada_1: larg_pulso_bancada_1,
-      larg_pulso_bancada_2: larg_pulso_bancada_2,
+      larg_pulso_bancada_1: larg_pulso_bancada_1 / 1000,
+      larg_pulso_bancada_2: larg_pulso_bancada_2 / 1000,
       rpm: rpm,
-      avanco_ignicao: avanco_ignicao_convertido,
+      avanco_ignicao: avanco_ignicao / 10,
       status_motor: parse_status_motor(status_motor),
-      afr_alvo_bancada_1: afr_alvo_bancada_1,
-      afr_alvo_bancada_2: afr_alvo_bancada_2,
-      pressao_coletor: Float.round(pressao_coletor_convertido, 2),
-      temp_ar_coletor: Float.round(temp_ar_coletor_convertido, 2),
-      temp_agua: Float.round(temp_agua_convertida, 2),
-      tps: tps,
-      tensao_bateria: tensao_bateria_convertida,
-      sonda_banco_1: sonda_banco_1,
-      sonda_banco_2: sonda_banco_2,
-      correcao_banco_1: correcao_banco_1,
-      correcao_banco_2: correcao_banco_2,
-      correcao_ar: correcao_ar,
-      correcao_aquecimento: correcao_aquecimento,
-      correcao_rapida: correcao_rapida,
-      cutoff_tps: cutoff_tps,
-      correcao_combs_baro: correcao_combs_baro,
-      correcao_combs_total: correcao_combs_total,
-      valor_ve_bancada_1: valor_ve_bancada_1,
-      valor_ve_bancada_2: valor_ve_bancada_2,
+      afr_alvo_bancada_1: afr_alvo_bancada_1 / 10,
+      afr_alvo_bancada_2: afr_alvo_bancada_2 / 10,
+      pressao_coletor: Float.round(pressao_coletor / 1000, 2),
+      temp_ar_coletor: Float.round(fahrenheit_to_celsius(temp_ar_coletor / 10), 2),
+      temp_agua: Float.round(fahrenheit_to_celsius(temp_agua / 10), 2),
+      tps: tps / 10,
+      tensao_bateria: tensao_bateria / 10,
+      sonda_banco_1: sonda_banco_1 / 10,
+      sonda_banco_2: sonda_banco_2 / 10,
+      correcao_banco_1: correcao_banco_1 / 10,
+      correcao_banco_2: correcao_banco_2 / 10,
+      correcao_ar: correcao_ar / 10,
+      correcao_aquecimento: correcao_aquecimento / 10,
+      correcao_rapida: correcao_rapida / 10,
+      cutoff_tps: cutoff_tps / 10,
+      correcao_combs_baro: correcao_combs_baro / 10,
+      correcao_combs_total: correcao_combs_total / 10,
+      valor_ve_bancada_1: valor_ve_bancada_1 / 10,
+      valor_ve_bancada_2: valor_ve_bancada_2 / 10,
       controle_marcha_lenta: controle_marcha_lenta,
-      avanco_ignicao_frio: avanco_ignicao_frio_convertido,
-      tps_variacao: tps_variacao,
-      map_variacao: map_variacao,
-      dwell: dwell,
-      carga_combustivel: carga_combustivel,
+      avanco_ignicao_frio: avanco_ignicao_frio / 10,
+      tps_variacao: tps_variacao / 10,
+      map_variacao: map_variacao / 10,
+      dwell: dwell / 10,
+      carga_combustivel: carga_combustivel / 10,
       atualizacoes_amc: atualizacoes_amc,
       kpaix_nao_usado: kpaix_nao_usado,
       leitura_tps_adc: leitura_tps_adc,
@@ -129,14 +122,12 @@ defmodule DashElixirFlutter.SerialParser do
 
   defp parse_status_motor(bits) do
     %{
-      motor_parado: (bits &&& 0b00000001) != 0,
-      motor_em_funcionamento: (bits &&& 0b00000010) != 0,
-      sincronismo_ok: (bits &&& 0b00000100) != 0,
-      aquecendo: (bits &&& 0b00001000) != 0,
-      corte_combustivel_ativo: (bits &&& 0b00010000) != 0,
-      injetando_combustivel: (bits &&& 0b00100000) != 0,
-      ignicao_ativa: (bits &&& 0b01000000) != 0,
-      erro_detectado: (bits &&& 0b10000000) != 0
+      motor_pronto: (bits &&& 0b00000001) != 0,
+      motor_em_partida: (bits &&& 0b00000010) != 0,
+      enriquecimento_partida: (bits &&& 0b00000100) != 0,
+      ciclo_aquecimento: (bits &&& 0b00001000) != 0
     }
   end
+
+  defp fahrenheit_to_celsius(f), do: (f - 32.0) * (5.0 / 9.0)
 end
