@@ -82,14 +82,10 @@ message EcuData {
 }
 
 message StatusMotor {
-  bool motor_parado = 1;
-  bool motor_em_funcionamento = 2;
-  bool sincronismo_ok = 3;
-  bool aquecendo = 4;
-  bool corte_combustivel_ativo = 5;
-  bool injetando_combustivel = 6;
-  bool ignicao_ativa = 7;
-  bool erro_detectado = 8;
+  bool motor_pronto = 1;
+  bool motor_em_partida = 2;
+  bool enriquecimento_partida = 3;
+  bool ciclo_aquecimento = 4;
 }
 
 message StreamData {

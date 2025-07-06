@@ -15,6 +15,7 @@ class ChartSettingsModal extends StatefulWidget {
 }
 
 class _ChartSettingsModalState extends State<ChartSettingsModal> {
+  late TextEditingController chartTypeController;
   late TextEditingController metricIdController;
   late TextEditingController minController;
   late TextEditingController maxController;
@@ -24,12 +25,18 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
 
   bool showVirtualKeyboard = false;
   TextEditingController? currentTextController;
-  final FocusNode focusNode = FocusNode();
+
+  final FocusNode unitFocusNode = FocusNode();
+  final FocusNode minFocusNode = FocusNode();
+  final FocusNode maxFocusNode = FocusNode();
+  final FocusNode decimalsFocusNode = FocusNode();
+  final FocusNode intervalFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     // Inicialize os controllers com os valores atuais
+    chartTypeController = TextEditingController(text: widget.config.chartType);
     metricIdController = TextEditingController(text: widget.config.metricId);
     minController = TextEditingController(text: widget.config.minValue.toString());
     maxController = TextEditingController(text: widget.config.maxValue.toString());
@@ -40,14 +47,20 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
 
   @override
   void dispose() {
-    // Limpe todos os controllers e focus nodes
+    chartTypeController.dispose();
     metricIdController.dispose();
     minController.dispose();
     maxController.dispose();
     unitController.dispose();
     decimalsController.dispose();
     intervalController.dispose();
-    focusNode.dispose();
+
+    unitFocusNode.dispose();
+    minFocusNode.dispose();
+    maxFocusNode.dispose();
+    decimalsFocusNode.dispose();
+    intervalFocusNode.dispose();
+
     super.dispose();
   }
 
@@ -90,80 +103,126 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
   Widget _buildFormFields() {
     return Column(
       children: [
-        // Linha 1: Dropdown e Unidade
-        Row(
-          children: [
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                value: widget.config.metricId,
-                decoration: const InputDecoration(labelText: "Informação", border: OutlineInputBorder()),
-                items: _buildAvailableMetrics(),
-                onChanged: (newValue) => metricIdController.text = newValue!,
+        // Tipo de gráfico
+        if (!showVirtualKeyboard) ...[
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: chartTypeController.text,
+                  decoration: const InputDecoration(labelText: "Tipo do gráfico", border: OutlineInputBorder()),
+                  items: const [
+                    DropdownMenuItem<String>(
+                      value: "RADIAL",
+                      child: Text("Ponteiro"),
+                    ),
+                    DropdownMenuItem<String>(
+                      value: "MINMAX",
+                      child: Text("Mínimo e máximo"),
+                    ),
+                  ],
+                  onChanged: (newValue) => {
+                    chartTypeController.text = newValue!,
+                    setState(() {}),
+                  },
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextFormField(
-                controller: unitController,
-                decoration: const InputDecoration(labelText: "Unidade", border: OutlineInputBorder()),
-                focusNode: focusNode,
-                onTap: () => _handleFieldTap(unitController),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
+            ],
+          ),
+        ],
+        const SizedBox(height: 6),
 
-        // Linha 2: Valor mínimo e máximo
+        // Informação e Unidade
         Row(
           children: [
-            Expanded(
-              child: TextFormField(
-                controller: minController,
-                decoration: const InputDecoration(labelText: "Valor mínimo", border: OutlineInputBorder()),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                focusNode: focusNode,
-                onTap: () => _handleFieldTap(minController),
+            if (!showVirtualKeyboard) ...[
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: widget.config.metricId,
+                  decoration: const InputDecoration(labelText: "Informação", border: OutlineInputBorder()),
+                  items: _buildAvailableMetrics(),
+                  onChanged: (newValue) => {
+                    metricIdController.text = newValue!,
+                    setState(() {}),
+                  },
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextFormField(
-                controller: maxController,
-                decoration: const InputDecoration(labelText: "Valor máximo", border: OutlineInputBorder()),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                focusNode: focusNode,
-                onTap: () => _handleFieldTap(maxController),
+              const SizedBox(width: 16),
+            ],
+            if ((showVirtualKeyboard && currentTextController == unitController) || !showVirtualKeyboard) ...[
+              Expanded(
+                child: TextFormField(
+                  controller: unitController,
+                  decoration: const InputDecoration(labelText: "Unidade", border: OutlineInputBorder()),
+                  focusNode: unitFocusNode,
+                  onTap: () => _handleFieldTap(unitController, unitFocusNode),
+                ),
               ),
-            ),
+            ]
           ],
         ),
-        const SizedBox(height: 4),
 
-        // Linha 3: Casas decimais e intervalo
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                controller: decimalsController,
-                decoration: const InputDecoration(labelText: "Casas decimais", border: OutlineInputBorder()),
-                keyboardType: TextInputType.number,
-                focusNode: focusNode,
-                onTap: () => _handleFieldTap(decimalsController),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextFormField(
-                controller: intervalController,
-                decoration: const InputDecoration(labelText: "Intervalo de valores", border: OutlineInputBorder()),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                focusNode: focusNode,
-                onTap: () => _handleFieldTap(intervalController),
-              ),
-            ),
-          ],
-        ),
+        if (chartTypeController.text == "RADIAL") ...[
+          const SizedBox(height: 6),
+          // Valor mínimo e máximo
+          Row(
+            children: [
+              if ((showVirtualKeyboard && currentTextController == minController) || !showVirtualKeyboard) ...[
+                Expanded(
+                  child: TextFormField(
+                    controller: minController,
+                    decoration: const InputDecoration(labelText: "Valor mínimo", border: OutlineInputBorder()),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    focusNode: minFocusNode,
+                    onTap: () => _handleFieldTap(minController, minFocusNode),
+                  ),
+                ),
+              ],
+              const SizedBox(width: 16),
+              if ((showVirtualKeyboard && currentTextController == maxController) || !showVirtualKeyboard) ...[
+                Expanded(
+                  child: TextFormField(
+                    controller: maxController,
+                    decoration: const InputDecoration(labelText: "Valor máximo", border: OutlineInputBorder()),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    focusNode: maxFocusNode,
+                    onTap: () => _handleFieldTap(maxController, maxFocusNode),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 6),
+
+          // Casas decimais e intervalo
+          Row(
+            children: [
+              if ((showVirtualKeyboard && currentTextController == decimalsController) || !showVirtualKeyboard) ...[
+                Expanded(
+                  child: TextFormField(
+                    controller: decimalsController,
+                    decoration: const InputDecoration(labelText: "Casas decimais", border: OutlineInputBorder()),
+                    keyboardType: TextInputType.number,
+                    focusNode: decimalsFocusNode,
+                    onTap: () => _handleFieldTap(decimalsController, decimalsFocusNode),
+                  ),
+                ),
+              ],
+              const SizedBox(width: 16),
+              if ((showVirtualKeyboard && currentTextController == intervalController) || !showVirtualKeyboard) ...[
+                Expanded(
+                  child: TextFormField(
+                    controller: intervalController,
+                    decoration: const InputDecoration(labelText: "Intervalo de valores", border: OutlineInputBorder()),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    focusNode: intervalFocusNode,
+                    onTap: () => _handleFieldTap(intervalController, intervalFocusNode),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ]
       ],
     );
   }
@@ -200,10 +259,28 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
   Widget _buildSaveButton() {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan[900]),
-        onPressed: _saveSettings,
-        child: const Text("Salvar", style: TextStyle(fontWeight: FontWeight.bold)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (showVirtualKeyboard) ...[
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () => setState(() => showVirtualKeyboard = false),
+                child: const Text("Fechar teclado", style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+          if (!showVirtualKeyboard) ...[
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan[900]),
+                onPressed: _saveSettings,
+                child: const Text("Salvar", style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ]
+        ],
       ),
     );
   }
@@ -257,11 +334,13 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
         .toList();
   }
 
-  void _handleFieldTap(TextEditingController controller) {
+  void _handleFieldTap(TextEditingController controller, FocusNode node) {
+    FocusScope.of(context).unfocus();
+
     setState(() {
       showVirtualKeyboard = true;
       currentTextController = controller;
-      focusNode.requestFocus();
+      node.requestFocus();
     });
   }
 
@@ -275,12 +354,17 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
 
   void _saveSettings() {
     final metricId = metricIdController.text;
+    final bool isRadial = chartTypeController.text == "RADIAL";
+
+    final double? min = isRadial ? double.tryParse(minController.text) ?? widget.config.minValue : null;
+    final double? max = isRadial ? double.tryParse(maxController.text) ?? widget.config.maxValue : null;
 
     final newConfig = ChartConfig(
+      chartType: chartTypeController.text,
       metricName: _getMetrics().firstWhere((x) => x["value"] == metricId)["label"]!,
       metricId: metricIdController.text,
-      minValue: double.tryParse(minController.text) ?? widget.config.minValue,
-      maxValue: double.tryParse(maxController.text) ?? widget.config.maxValue,
+      minValue: min,
+      maxValue: max,
       unit: unitController.text,
       decimalPlaces: int.tryParse(decimalsController.text) ?? widget.config.decimalPlaces,
       valueInterval: double.tryParse(intervalController.text) ?? widget.config.valueInterval,
@@ -291,168 +375,3 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
     Navigator.pop(context);
   }
 }
-
-  // void _showChartSettings(BuildContext context, int chartId, ChartConfig config) {
-  //   final metricIdController = TextEditingController(text: config.metricId);
-  //   final minController = TextEditingController(text: config.minValue.toString());
-  //   final maxController = TextEditingController(text: config.maxValue.toString());
-  //   final unitController = TextEditingController(text: config.unit);
-  //   final decimalsController = TextEditingController(text: config.decimalPlaces.toString());
-  //   final intervalController = TextEditingController(text: config.valueInterval.toString());
-  //   final availableMetrics = [
-  //     const DropdownMenuItem<String>(value: "segundosMotorLigado", child: Text("Segundos ECU ligada")),
-  //     const DropdownMenuItem<String>(value: "largPulsoBancada1", child: Text("Largura pulso bancada 01")),
-  //     const DropdownMenuItem<String>(value: "largPulsoBancada2", child: Text("Largura pulso bancada 02")),
-  //     const DropdownMenuItem<String>(value: "rpm", child: Text("RPM")),
-  //     const DropdownMenuItem<String>(value: "avancoIgnicao", child: Text("Avanço ignição")),
-  //     const DropdownMenuItem<String>(value: "afrAlvoBancada1", child: Text("AFR alvo bancada 01")),
-  //     const DropdownMenuItem<String>(value: "afrAlvoBancada2", child: Text("AFR alvo bancada 02")),
-  //     const DropdownMenuItem<String>(value: "pressaoColetor", child: Text("Pressão coletor")),
-  //     const DropdownMenuItem<String>(value: "tempArColetor", child: Text("Temperatura ar coletor")),
-  //     const DropdownMenuItem<String>(value: "tempAgua", child: Text("Temperatura água")),
-  //     const DropdownMenuItem<String>(value: "tps", child: Text("TPS")),
-  //     const DropdownMenuItem<String>(value: "tensaoBateria", child: Text("Tensão bateria")),
-  //     const DropdownMenuItem<String>(value: "sondaBanco1", child: Text("Sonda banco 01")),
-  //     const DropdownMenuItem<String>(value: "sondaBanco2", child: Text("Sonda banco 02")),
-  //     const DropdownMenuItem<String>(value: "correcaoBanco1", child: Text("Correção banco 01")),
-  //     const DropdownMenuItem<String>(value: "correcaoBanco2", child: Text("Correção banco 02")),
-  //     const DropdownMenuItem<String>(value: "correcaoAr", child: Text("Correção ar")),
-  //     const DropdownMenuItem<String>(value: "correcaoAquecimento", child: Text("Correção aquecimento")),
-  //     const DropdownMenuItem<String>(value: "correcaoRapida", child: Text("Correção rápida")),
-  //     const DropdownMenuItem<String>(value: "cutoffTps", child: Text("Cutoff TPS")),
-  //     const DropdownMenuItem<String>(value: "correcaoCombsBaro", child: Text("Correção combustível baro")),
-  //     const DropdownMenuItem<String>(value: "correcaoCombsTotal", child: Text("Correção combustível total")),
-  //     const DropdownMenuItem<String>(value: "valorVeBancada1", child: Text("Valor VE bancada 01")),
-  //     const DropdownMenuItem<String>(value: "valorVeBancada2", child: Text("Valor VE bancada 02")),
-  //     const DropdownMenuItem<String>(value: "controleMarchaLenta", child: Text("Controle marcha lenta")),
-  //     const DropdownMenuItem<String>(value: "avancoIgnicaoFrio", child: Text("Avanço ignição frio")),
-  //     const DropdownMenuItem<String>(value: "tpsVariacao", child: Text("TPS variação")),
-  //     const DropdownMenuItem<String>(value: "mapVariacao", child: Text("MAP variação")),
-  //     const DropdownMenuItem<String>(value: "dwell", child: Text("Dwell")),
-  //     const DropdownMenuItem<String>(value: "cargaCombustivel", child: Text("Carga combustível")),
-  //     const DropdownMenuItem<String>(value: "entradaAnalogica0", child: Text("Entrada analógica 0")),
-  //     const DropdownMenuItem<String>(value: "entradaAnalogica1", child: Text("Entrada analógica 1")),
-  //     const DropdownMenuItem<String>(value: "entradaAnalogica2", child: Text("Entrada analógica 2")),
-  //   ];
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     backgroundColor: Colors.grey[900],
-  //     builder: (context) {
-  //       return Padding(
-  //         padding: const EdgeInsets.all(8),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           crossAxisAlignment: CrossAxisAlignment.stretch,
-  //           children: [
-  //             Row(
-  //               children: [
-  //                 const Expanded(
-  //                   child: Text(
-  //                     "Configurações do Gráfico",
-  //                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //                   ),
-  //                 ),
-  //                 ElevatedButton(
-  //                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red[900]),
-  //                   child: const Text("Limpar", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-  //                   onPressed: () {
-  //                     final defaultConf = preferencesService.getDefaultConfigs();
-  //                     preferencesService.saveChartConfigs({...defaultConf, chartId: defaultConf[chartId]!});
-  //                     Navigator.pop(context);
-  //                   },
-  //                 ),
-  //               ],
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Row(
-  //               children: [
-  //                 Expanded(
-  //                   child: DropdownButtonFormField<String>(
-  //                     value: config.metricId,
-  //                     decoration: const InputDecoration(labelText: "Informação", border: OutlineInputBorder()),
-  //                     items: availableMetrics,
-  //                     onChanged: (newValue) => metricIdController.text = newValue!,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(width: 16),
-  //                 Expanded(
-  //                   child: TextFormField(
-  //                     controller: unitController,
-  //                     decoration: const InputDecoration(labelText: "Unidade", border: OutlineInputBorder()),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Row(
-  //               children: [
-  //                 Expanded(
-  //                   child: TextFormField(
-  //                     controller: minController,
-  //                     decoration: const InputDecoration(labelText: "Valor mínimo", border: OutlineInputBorder()),
-  //                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(width: 16),
-  //                 Expanded(
-  //                   child: TextFormField(
-  //                     controller: maxController,
-  //                     decoration: const InputDecoration(labelText: "Valor máximo", border: OutlineInputBorder()),
-  //                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Row(
-  //               children: [
-  //                 Expanded(
-  //                   child: TextFormField(
-  //                     controller: decimalsController,
-  //                     decoration: const InputDecoration(labelText: "Casas decimais", border: OutlineInputBorder()),
-  //                     keyboardType: TextInputType.number,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(width: 16),
-  //                 Expanded(
-  //                   child: TextFormField(
-  //                     controller: intervalController,
-  //                     decoration:
-  //                         const InputDecoration(labelText: "Intervalo de valores", border: OutlineInputBorder()),
-  //                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Row(
-  //               mainAxisAlignment: MainAxisAlignment.,
-  //               children: [
-  //                 ElevatedButton(
-  //                   style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan[900]),
-  //                   child: const Text("Salvar", style: TextStyle(fontWeight: FontWeight.bold)),
-  //                   onPressed: () {
-  //                     final newConfig = ChartConfig(
-  //                       metricName: config.metricName,
-  //                       metricId: metricIdController.text,
-  //                       minValue: double.tryParse(minController.text) ?? config.minValue,
-  //                       maxValue: double.tryParse(maxController.text) ?? config.maxValue,
-  //                       unit: unitController.text,
-  //                       decimalPlaces: int.tryParse(decimalsController.text) ?? config.decimalPlaces,
-  //                       valueInterval: double.tryParse(intervalController.text) ?? config.valueInterval,
-  //                     );
-  //                     final currentConfigs = preferencesService.getChartConfigs();
-  //                     preferencesService.saveChartConfigs({...currentConfigs, chartId: newConfig});
-  //                     Navigator.pop(context);
-  //                   },
-  //                 )
-  //               ],
-  //             ),
-  //             const SizedBox(height: 2),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }

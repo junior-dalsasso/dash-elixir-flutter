@@ -715,39 +715,23 @@ class EcuData extends $pb.GeneratedMessage {
 
 class StatusMotor extends $pb.GeneratedMessage {
   factory StatusMotor({
-    $core.bool? motorParado,
-    $core.bool? motorEmFuncionamento,
-    $core.bool? sincronismoOk,
-    $core.bool? aquecendo,
-    $core.bool? corteCombustivelAtivo,
-    $core.bool? injetandoCombustivel,
-    $core.bool? ignicaoAtiva,
-    $core.bool? erroDetectado,
+    $core.bool? motorPronto,
+    $core.bool? motorEmPartida,
+    $core.bool? enriquecimentoPartida,
+    $core.bool? cicloAquecimento,
   }) {
     final $result = create();
-    if (motorParado != null) {
-      $result.motorParado = motorParado;
+    if (motorPronto != null) {
+      $result.motorPronto = motorPronto;
     }
-    if (motorEmFuncionamento != null) {
-      $result.motorEmFuncionamento = motorEmFuncionamento;
+    if (motorEmPartida != null) {
+      $result.motorEmPartida = motorEmPartida;
     }
-    if (sincronismoOk != null) {
-      $result.sincronismoOk = sincronismoOk;
+    if (enriquecimentoPartida != null) {
+      $result.enriquecimentoPartida = enriquecimentoPartida;
     }
-    if (aquecendo != null) {
-      $result.aquecendo = aquecendo;
-    }
-    if (corteCombustivelAtivo != null) {
-      $result.corteCombustivelAtivo = corteCombustivelAtivo;
-    }
-    if (injetandoCombustivel != null) {
-      $result.injetandoCombustivel = injetandoCombustivel;
-    }
-    if (ignicaoAtiva != null) {
-      $result.ignicaoAtiva = ignicaoAtiva;
-    }
-    if (erroDetectado != null) {
-      $result.erroDetectado = erroDetectado;
+    if (cicloAquecimento != null) {
+      $result.cicloAquecimento = cicloAquecimento;
     }
     return $result;
   }
@@ -756,14 +740,10 @@ class StatusMotor extends $pb.GeneratedMessage {
   factory StatusMotor.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StatusMotor', package: const $pb.PackageName(_omitMessageNames ? '' : 'DashElixirFlutter'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'motorParado')
-    ..aOB(2, _omitFieldNames ? '' : 'motorEmFuncionamento')
-    ..aOB(3, _omitFieldNames ? '' : 'sincronismoOk')
-    ..aOB(4, _omitFieldNames ? '' : 'aquecendo')
-    ..aOB(5, _omitFieldNames ? '' : 'corteCombustivelAtivo')
-    ..aOB(6, _omitFieldNames ? '' : 'injetandoCombustivel')
-    ..aOB(7, _omitFieldNames ? '' : 'ignicaoAtiva')
-    ..aOB(8, _omitFieldNames ? '' : 'erroDetectado')
+    ..aOB(1, _omitFieldNames ? '' : 'motorPronto')
+    ..aOB(2, _omitFieldNames ? '' : 'motorEmPartida')
+    ..aOB(3, _omitFieldNames ? '' : 'enriquecimentoPartida')
+    ..aOB(4, _omitFieldNames ? '' : 'cicloAquecimento')
     ..hasRequiredFields = false
   ;
 
@@ -789,76 +769,40 @@ class StatusMotor extends $pb.GeneratedMessage {
   static StatusMotor? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.bool get motorParado => $_getBF(0);
+  $core.bool get motorPronto => $_getBF(0);
   @$pb.TagNumber(1)
-  set motorParado($core.bool v) { $_setBool(0, v); }
+  set motorPronto($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasMotorParado() => $_has(0);
+  $core.bool hasMotorPronto() => $_has(0);
   @$pb.TagNumber(1)
-  void clearMotorParado() => clearField(1);
+  void clearMotorPronto() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.bool get motorEmFuncionamento => $_getBF(1);
+  $core.bool get motorEmPartida => $_getBF(1);
   @$pb.TagNumber(2)
-  set motorEmFuncionamento($core.bool v) { $_setBool(1, v); }
+  set motorEmPartida($core.bool v) { $_setBool(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasMotorEmFuncionamento() => $_has(1);
+  $core.bool hasMotorEmPartida() => $_has(1);
   @$pb.TagNumber(2)
-  void clearMotorEmFuncionamento() => clearField(2);
+  void clearMotorEmPartida() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.bool get sincronismoOk => $_getBF(2);
+  $core.bool get enriquecimentoPartida => $_getBF(2);
   @$pb.TagNumber(3)
-  set sincronismoOk($core.bool v) { $_setBool(2, v); }
+  set enriquecimentoPartida($core.bool v) { $_setBool(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasSincronismoOk() => $_has(2);
+  $core.bool hasEnriquecimentoPartida() => $_has(2);
   @$pb.TagNumber(3)
-  void clearSincronismoOk() => clearField(3);
+  void clearEnriquecimentoPartida() => clearField(3);
 
   @$pb.TagNumber(4)
-  $core.bool get aquecendo => $_getBF(3);
+  $core.bool get cicloAquecimento => $_getBF(3);
   @$pb.TagNumber(4)
-  set aquecendo($core.bool v) { $_setBool(3, v); }
+  set cicloAquecimento($core.bool v) { $_setBool(3, v); }
   @$pb.TagNumber(4)
-  $core.bool hasAquecendo() => $_has(3);
+  $core.bool hasCicloAquecimento() => $_has(3);
   @$pb.TagNumber(4)
-  void clearAquecendo() => clearField(4);
-
-  @$pb.TagNumber(5)
-  $core.bool get corteCombustivelAtivo => $_getBF(4);
-  @$pb.TagNumber(5)
-  set corteCombustivelAtivo($core.bool v) { $_setBool(4, v); }
-  @$pb.TagNumber(5)
-  $core.bool hasCorteCombustivelAtivo() => $_has(4);
-  @$pb.TagNumber(5)
-  void clearCorteCombustivelAtivo() => clearField(5);
-
-  @$pb.TagNumber(6)
-  $core.bool get injetandoCombustivel => $_getBF(5);
-  @$pb.TagNumber(6)
-  set injetandoCombustivel($core.bool v) { $_setBool(5, v); }
-  @$pb.TagNumber(6)
-  $core.bool hasInjetandoCombustivel() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearInjetandoCombustivel() => clearField(6);
-
-  @$pb.TagNumber(7)
-  $core.bool get ignicaoAtiva => $_getBF(6);
-  @$pb.TagNumber(7)
-  set ignicaoAtiva($core.bool v) { $_setBool(6, v); }
-  @$pb.TagNumber(7)
-  $core.bool hasIgnicaoAtiva() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearIgnicaoAtiva() => clearField(7);
-
-  @$pb.TagNumber(8)
-  $core.bool get erroDetectado => $_getBF(7);
-  @$pb.TagNumber(8)
-  set erroDetectado($core.bool v) { $_setBool(7, v); }
-  @$pb.TagNumber(8)
-  $core.bool hasErroDetectado() => $_has(7);
-  @$pb.TagNumber(8)
-  void clearErroDetectado() => clearField(8);
+  void clearCicloAquecimento() => clearField(4);
 }
 
 class StreamData extends $pb.GeneratedMessage {

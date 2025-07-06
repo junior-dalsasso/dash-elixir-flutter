@@ -116,26 +116,19 @@ final $typed_data.Uint8List ecuDataDescriptor = $convert.base64Decode(
 const StatusMotor$json = {
   '1': 'StatusMotor',
   '2': [
-    {'1': 'motor_parado', '3': 1, '4': 1, '5': 8, '10': 'motorParado'},
-    {'1': 'motor_em_funcionamento', '3': 2, '4': 1, '5': 8, '10': 'motorEmFuncionamento'},
-    {'1': 'sincronismo_ok', '3': 3, '4': 1, '5': 8, '10': 'sincronismoOk'},
-    {'1': 'aquecendo', '3': 4, '4': 1, '5': 8, '10': 'aquecendo'},
-    {'1': 'corte_combustivel_ativo', '3': 5, '4': 1, '5': 8, '10': 'corteCombustivelAtivo'},
-    {'1': 'injetando_combustivel', '3': 6, '4': 1, '5': 8, '10': 'injetandoCombustivel'},
-    {'1': 'ignicao_ativa', '3': 7, '4': 1, '5': 8, '10': 'ignicaoAtiva'},
-    {'1': 'erro_detectado', '3': 8, '4': 1, '5': 8, '10': 'erroDetectado'},
+    {'1': 'motor_pronto', '3': 1, '4': 1, '5': 8, '10': 'motorPronto'},
+    {'1': 'motor_em_partida', '3': 2, '4': 1, '5': 8, '10': 'motorEmPartida'},
+    {'1': 'enriquecimento_partida', '3': 3, '4': 1, '5': 8, '10': 'enriquecimentoPartida'},
+    {'1': 'ciclo_aquecimento', '3': 4, '4': 1, '5': 8, '10': 'cicloAquecimento'},
   ],
 };
 
 /// Descriptor for `StatusMotor`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List statusMotorDescriptor = $convert.base64Decode(
-    'CgtTdGF0dXNNb3RvchIhCgxtb3Rvcl9wYXJhZG8YASABKAhSC21vdG9yUGFyYWRvEjQKFm1vdG'
-    '9yX2VtX2Z1bmNpb25hbWVudG8YAiABKAhSFG1vdG9yRW1GdW5jaW9uYW1lbnRvEiUKDnNpbmNy'
-    'b25pc21vX29rGAMgASgIUg1zaW5jcm9uaXNtb09rEhwKCWFxdWVjZW5kbxgEIAEoCFIJYXF1ZW'
-    'NlbmRvEjYKF2NvcnRlX2NvbWJ1c3RpdmVsX2F0aXZvGAUgASgIUhVjb3J0ZUNvbWJ1c3RpdmVs'
-    'QXRpdm8SMwoVaW5qZXRhbmRvX2NvbWJ1c3RpdmVsGAYgASgIUhRpbmpldGFuZG9Db21idXN0aX'
-    'ZlbBIjCg1pZ25pY2FvX2F0aXZhGAcgASgIUgxpZ25pY2FvQXRpdmESJQoOZXJyb19kZXRlY3Rh'
-    'ZG8YCCABKAhSDWVycm9EZXRlY3RhZG8=');
+    'CgtTdGF0dXNNb3RvchIhCgxtb3Rvcl9wcm9udG8YASABKAhSC21vdG9yUHJvbnRvEigKEG1vdG'
+    '9yX2VtX3BhcnRpZGEYAiABKAhSDm1vdG9yRW1QYXJ0aWRhEjUKFmVucmlxdWVjaW1lbnRvX3Bh'
+    'cnRpZGEYAyABKAhSFWVucmlxdWVjaW1lbnRvUGFydGlkYRIrChFjaWNsb19hcXVlY2ltZW50bx'
+    'gEIAEoCFIQY2ljbG9BcXVlY2ltZW50bw==');
 
 @$core.Deprecated('Use streamDataDescriptor instead')
 const StreamData$json = {

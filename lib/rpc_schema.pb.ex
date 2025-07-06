@@ -58,14 +58,10 @@ defmodule DashElixirFlutter.StatusMotor do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
-  field :motor_parado, 1, type: :bool, json_name: "motorParado"
-  field :motor_em_funcionamento, 2, type: :bool, json_name: "motorEmFuncionamento"
-  field :sincronismo_ok, 3, type: :bool, json_name: "sincronismoOk"
-  field :aquecendo, 4, type: :bool
-  field :corte_combustivel_ativo, 5, type: :bool, json_name: "corteCombustivelAtivo"
-  field :injetando_combustivel, 6, type: :bool, json_name: "injetandoCombustivel"
-  field :ignicao_ativa, 7, type: :bool, json_name: "ignicaoAtiva"
-  field :erro_detectado, 8, type: :bool, json_name: "erroDetectado"
+  field :motor_pronto, 1, type: :bool, json_name: "motorPronto"
+  field :motor_em_partida, 2, type: :bool, json_name: "motorEmPartida"
+  field :enriquecimento_partida, 3, type: :bool, json_name: "enriquecimentoPartida"
+  field :ciclo_aquecimento, 4, type: :bool, json_name: "cicloAquecimento"
 end
 
 defmodule DashElixirFlutter.StreamData do
