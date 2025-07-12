@@ -9,12 +9,10 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 class EcuDataMainView extends StatefulWidget {
   final EcuData ecuData;
   final double gaugeSize;
-  final PreferencesService preferencesService;
 
   const EcuDataMainView({
     super.key,
     required this.ecuData,
-    required this.preferencesService,
     this.gaugeSize = 240.0,
   });
 
@@ -23,24 +21,9 @@ class EcuDataMainView extends StatefulWidget {
 }
 
 class _EcuDataMainViewState extends State<EcuDataMainView> {
-  bool _isInitialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initialize();
-  }
-
-  Future<void> _initialize() async {
-    await widget.preferencesService.init();
-    setState(() => _isInitialized = true);
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (!_isInitialized) return const CircularProgressIndicator();
-
-    final chartConfigs = widget.preferencesService.getChartConfigs();
+    final chartConfigs = PreferencesService.instance.getChartConfigs();
 
     return Expanded(
       child: Stack(
@@ -215,9 +198,9 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
       }
 
       if (changed) {
-        final configs = widget.preferencesService.getChartConfigs();
+        final configs = PreferencesService.instance.getChartConfigs();
         configs[chartId] = chartConfigs;
-        widget.preferencesService.saveChartConfigs(configs);
+        PreferencesService.instance.saveChartConfigs(configs);
       }
     }
 
@@ -284,13 +267,7 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.grey[900],
-      builder: (context) {
-        return ChartSettingsModal(
-          chartId: chartId,
-          config: config,
-          preferencesService: widget.preferencesService,
-        );
-      },
+      builder: (context) => ChartSettingsModal(chartId: chartId, config: config),
     );
   }
 
@@ -298,8 +275,8 @@ class _EcuDataMainViewState extends State<EcuDataMainView> {
     chartConfigs.maxValue = null;
     chartConfigs.minValue = null;
 
-    final configs = widget.preferencesService.getChartConfigs();
+    final configs = PreferencesService.instance.getChartConfigs();
     configs[chartId] = chartConfigs;
-    widget.preferencesService.saveChartConfigs(configs);
+    PreferencesService.instance.saveChartConfigs(configs);
   }
 }

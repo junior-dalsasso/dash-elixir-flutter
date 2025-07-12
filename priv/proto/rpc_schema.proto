@@ -4,13 +4,29 @@ import "google/api/annotations.proto";
 
 package DashElixirFlutter;
 
-message Empty {}
-
 // The actual RPC service definition with HTTP/2 endpoints defined
 service RPC {
   rpc StreamInfo (Empty) returns (stream StreamData) {
     option (google.api.http) = {
         get: "/streamInfo"
+    };
+  }
+
+  rpc startCalibration (Empty) returns (Empty) {
+    option (google.api.http) = {
+        get: "/startCalibration"
+    };
+  }
+
+  rpc resetTrip (Empty) returns (Empty) {
+    option (google.api.http) = {
+        get: "/resetTrip"
+    };
+  }
+
+  rpc resetHodometer (Empty) returns (Empty) {
+    option (google.api.http) = {
+        get: "/resetHodometer"
     };
   }
 
@@ -32,6 +48,8 @@ service RPC {
     };
   }
 }
+
+message Empty {}
 
 message EcuData {
   float segundos_motor_ligado = 1;
@@ -88,8 +106,19 @@ message StatusMotor {
   bool ciclo_aquecimento = 4;
 }
 
+message ConsumptionData {
+  float hodometer = 1;
+  float trip = 2;
+  float hodometer_consumed = 3;
+  float trip_consumed = 4;
+  float hodometer_fuel_by_distance = 5;
+  float trip_fuel_by_distance = 6;
+  float current_speed = 7;
+}
+
 message StreamData {
   EcuData ecu_data = 1;
+  ConsumptionData consumption_data = 2;
 }
 
 message Device {

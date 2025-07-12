@@ -9,14 +9,22 @@ defmodule DashElixirFlutter.Application do
   def start(_type, _args) do
     children =
       [
-        {GRPC.Server.Supervisor,
-         endpoint: DashElixirFlutter.RPC.Endpoint, port: 50051, start_server: true}
+        {GRPC.Server.Supervisor, endpoint: DashElixirFlutter.RPC.Endpoint, port: 50051, start_server: true}
       ] ++
         children(Nerves.Runtime.mix_target()) ++
-        [DashElixirFlutter.BluetoothInit, DashElixirFlutter.Serial]
+        [
+          DashElixirFlutter.Repo,
+          {Ecto.Migrator, repos: Application.fetch_env!(:dash_elixir_flutter, :ecto_repos)},
+          Supervisor.child_spec({DashElixirFlutter.GpioEmulator, pin: 14, interval: 10}, id: :gpio_emulator_14),
+          Supervisor.child_spec({DashElixirFlutter.GpioEmulator, pin: 15, interval: 20}, id: :gpio_emulator_15),
+
+          DashElixirFlutter.BluetoothInit,
+          DashElixirFlutter.StreamDataBuilder,
+          DashElixirFlutter.Serial,
+          DashElixirFlutter.Consumption
+        ]
 
     opts = [strategy: :one_for_one, name: DashElixirFlutter.Supervisor]
-
     Supervisor.start_link(children, opts)
   end
 

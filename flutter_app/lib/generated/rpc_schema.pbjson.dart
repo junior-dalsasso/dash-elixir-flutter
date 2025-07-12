@@ -130,18 +130,43 @@ final $typed_data.Uint8List statusMotorDescriptor = $convert.base64Decode(
     'cnRpZGEYAyABKAhSFWVucmlxdWVjaW1lbnRvUGFydGlkYRIrChFjaWNsb19hcXVlY2ltZW50bx'
     'gEIAEoCFIQY2ljbG9BcXVlY2ltZW50bw==');
 
+@$core.Deprecated('Use consumptionDataDescriptor instead')
+const ConsumptionData$json = {
+  '1': 'ConsumptionData',
+  '2': [
+    {'1': 'hodometer', '3': 1, '4': 1, '5': 2, '10': 'hodometer'},
+    {'1': 'trip', '3': 2, '4': 1, '5': 2, '10': 'trip'},
+    {'1': 'hodometer_consumed', '3': 3, '4': 1, '5': 2, '10': 'hodometerConsumed'},
+    {'1': 'trip_consumed', '3': 4, '4': 1, '5': 2, '10': 'tripConsumed'},
+    {'1': 'hodometer_fuel_by_distance', '3': 5, '4': 1, '5': 2, '10': 'hodometerFuelByDistance'},
+    {'1': 'trip_fuel_by_distance', '3': 6, '4': 1, '5': 2, '10': 'tripFuelByDistance'},
+    {'1': 'current_speed', '3': 7, '4': 1, '5': 2, '10': 'currentSpeed'},
+  ],
+};
+
+/// Descriptor for `ConsumptionData`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List consumptionDataDescriptor = $convert.base64Decode(
+    'Cg9Db25zdW1wdGlvbkRhdGESHAoJaG9kb21ldGVyGAEgASgCUglob2RvbWV0ZXISEgoEdHJpcB'
+    'gCIAEoAlIEdHJpcBItChJob2RvbWV0ZXJfY29uc3VtZWQYAyABKAJSEWhvZG9tZXRlckNvbnN1'
+    'bWVkEiMKDXRyaXBfY29uc3VtZWQYBCABKAJSDHRyaXBDb25zdW1lZBI7Chpob2RvbWV0ZXJfZn'
+    'VlbF9ieV9kaXN0YW5jZRgFIAEoAlIXaG9kb21ldGVyRnVlbEJ5RGlzdGFuY2USMQoVdHJpcF9m'
+    'dWVsX2J5X2Rpc3RhbmNlGAYgASgCUhJ0cmlwRnVlbEJ5RGlzdGFuY2USIwoNY3VycmVudF9zcG'
+    'VlZBgHIAEoAlIMY3VycmVudFNwZWVk');
+
 @$core.Deprecated('Use streamDataDescriptor instead')
 const StreamData$json = {
   '1': 'StreamData',
   '2': [
     {'1': 'ecu_data', '3': 1, '4': 1, '5': 11, '6': '.DashElixirFlutter.EcuData', '10': 'ecuData'},
+    {'1': 'consumption_data', '3': 2, '4': 1, '5': 11, '6': '.DashElixirFlutter.ConsumptionData', '10': 'consumptionData'},
   ],
 };
 
 /// Descriptor for `StreamData`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List streamDataDescriptor = $convert.base64Decode(
     'CgpTdHJlYW1EYXRhEjUKCGVjdV9kYXRhGAEgASgLMhouRGFzaEVsaXhpckZsdXR0ZXIuRWN1RG'
-    'F0YVIHZWN1RGF0YQ==');
+    'F0YVIHZWN1RGF0YRJNChBjb25zdW1wdGlvbl9kYXRhGAIgASgLMiIuRGFzaEVsaXhpckZsdXR0'
+    'ZXIuQ29uc3VtcHRpb25EYXRhUg9jb25zdW1wdGlvbkRhdGE=');
 
 @$core.Deprecated('Use deviceDescriptor instead')
 const Device$json = {

@@ -23,6 +23,9 @@ void main() async {
     });
   }
 
+  final prefs = PreferencesService.instance;
+  await prefs.init();
+
   runApp(const MyApp());
 }
 
@@ -35,7 +38,7 @@ class MyApp extends HookWidget {
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData.dark().copyWith(textTheme: GoogleFonts.latoTextTheme().apply(bodyColor: Colors.white, displayColor: Colors.white)),
       initialRoute: '/dash',
-      routes: {"/dash": (context) => EcuDataScreen(preferencesService: PreferencesService())},
+      routes: {"/dash": (context) => const EcuDataScreen()},
       builder: (BuildContext context, Widget? child) => Scaffold(body: child!),
     );
   }

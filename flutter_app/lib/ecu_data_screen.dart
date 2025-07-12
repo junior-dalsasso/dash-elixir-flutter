@@ -5,11 +5,9 @@ import 'package:flutter_app/ecu_data_menu.dart';
 import 'package:flutter_app/generated/rpc_schema.pbgrpc.dart';
 import 'package:flutter_app/opala_logo.dart';
 import 'package:flutter_app/fade_in.dart';
-import 'package:flutter_app/preferences_service.dart';
 
 class EcuDataScreen extends StatelessWidget {
-  final PreferencesService preferencesService;
-  const EcuDataScreen({super.key, required this.preferencesService});
+  const EcuDataScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +42,11 @@ class EcuDataScreen extends StatelessWidget {
   Widget _buildPage(StreamData? data, BuildContext context) {
     data ??= StreamData();
     var ecuData = data.ecuData;
+    var consData = data.consumptionData;
 
     return Row(children: [
-      EcuDataMenu(ecuData: ecuData),
-      EcuDataMainView(ecuData: ecuData, preferencesService: preferencesService)
+      EcuDataMenu(ecuData: ecuData, consData: consData),
+      EcuDataMainView(ecuData: ecuData)
     ]);
   }
 }

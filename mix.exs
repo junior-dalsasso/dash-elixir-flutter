@@ -41,11 +41,14 @@ defmodule DashElixirFlutter.MixProject do
       {:nerves_flutter_support, "~> 1.0.0"},
       {:circuits_i2c, "~> 2.0"},
       {:muontrap, "~> 1.0"},
+      {:circuits_gpio, "~> 2.1"},
+      {:ecto_sql, "~> 3.0"},
+      {:ecto_sqlite3, "~> 0.17"},
 
       # Serial Deps
       {:circuits_uart, "~> 1.5"},
 
-      # Flutter Example Deps
+      # Flutter Deps
       {:grpc, "~> 0.9"},
       {:protobuf_generate, "~> 0.1.1"},
       {:jason, "~> 1.4.0"}

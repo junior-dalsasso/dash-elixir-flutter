@@ -6,9 +6,8 @@ import "package:virtual_keyboard_custom_layout/virtual_keyboard_custom_layout.da
 class ChartSettingsModal extends StatefulWidget {
   final int chartId;
   final ChartConfig config;
-  final PreferencesService preferencesService;
 
-  const ChartSettingsModal({super.key, required this.chartId, required this.config, required this.preferencesService});
+  const ChartSettingsModal({super.key, required this.chartId, required this.config});
 
   @override
   State<ChartSettingsModal> createState() => _ChartSettingsModalState();
@@ -345,10 +344,10 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
   }
 
   void _resetToDefaults() {
-    final currentConfigs = widget.preferencesService.getChartConfigs();
-    final defaultConf = widget.preferencesService.getDefaultConfigs();
+    final currentConfigs = PreferencesService.instance.getChartConfigs();
+    final defaultConf = PreferencesService.instance.getDefaultConfigs();
 
-    widget.preferencesService.saveChartConfigs({...currentConfigs, widget.chartId: defaultConf[widget.chartId]!});
+    PreferencesService.instance.saveChartConfigs({...currentConfigs, widget.chartId: defaultConf[widget.chartId]!});
     Navigator.pop(context);
   }
 
@@ -370,8 +369,8 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
       valueInterval: double.tryParse(intervalController.text) ?? widget.config.valueInterval,
     );
 
-    final currentConfigs = widget.preferencesService.getChartConfigs();
-    widget.preferencesService.saveChartConfigs({...currentConfigs, widget.chartId: newConfig});
+    final currentConfigs = PreferencesService.instance.getChartConfigs();
+    PreferencesService.instance.saveChartConfigs({...currentConfigs, widget.chartId: newConfig});
     Navigator.pop(context);
   }
 }

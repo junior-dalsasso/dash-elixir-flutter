@@ -805,13 +805,151 @@ class StatusMotor extends $pb.GeneratedMessage {
   void clearCicloAquecimento() => clearField(4);
 }
 
+class ConsumptionData extends $pb.GeneratedMessage {
+  factory ConsumptionData({
+    $core.double? hodometer,
+    $core.double? trip,
+    $core.double? hodometerConsumed,
+    $core.double? tripConsumed,
+    $core.double? hodometerFuelByDistance,
+    $core.double? tripFuelByDistance,
+    $core.double? currentSpeed,
+  }) {
+    final $result = create();
+    if (hodometer != null) {
+      $result.hodometer = hodometer;
+    }
+    if (trip != null) {
+      $result.trip = trip;
+    }
+    if (hodometerConsumed != null) {
+      $result.hodometerConsumed = hodometerConsumed;
+    }
+    if (tripConsumed != null) {
+      $result.tripConsumed = tripConsumed;
+    }
+    if (hodometerFuelByDistance != null) {
+      $result.hodometerFuelByDistance = hodometerFuelByDistance;
+    }
+    if (tripFuelByDistance != null) {
+      $result.tripFuelByDistance = tripFuelByDistance;
+    }
+    if (currentSpeed != null) {
+      $result.currentSpeed = currentSpeed;
+    }
+    return $result;
+  }
+  ConsumptionData._() : super();
+  factory ConsumptionData.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ConsumptionData.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ConsumptionData', package: const $pb.PackageName(_omitMessageNames ? '' : 'DashElixirFlutter'), createEmptyInstance: create)
+    ..a<$core.double>(1, _omitFieldNames ? '' : 'hodometer', $pb.PbFieldType.OF)
+    ..a<$core.double>(2, _omitFieldNames ? '' : 'trip', $pb.PbFieldType.OF)
+    ..a<$core.double>(3, _omitFieldNames ? '' : 'hodometerConsumed', $pb.PbFieldType.OF)
+    ..a<$core.double>(4, _omitFieldNames ? '' : 'tripConsumed', $pb.PbFieldType.OF)
+    ..a<$core.double>(5, _omitFieldNames ? '' : 'hodometerFuelByDistance', $pb.PbFieldType.OF)
+    ..a<$core.double>(6, _omitFieldNames ? '' : 'tripFuelByDistance', $pb.PbFieldType.OF)
+    ..a<$core.double>(7, _omitFieldNames ? '' : 'currentSpeed', $pb.PbFieldType.OF)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ConsumptionData clone() => ConsumptionData()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ConsumptionData copyWith(void Function(ConsumptionData) updates) => super.copyWith((message) => updates(message as ConsumptionData)) as ConsumptionData;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static ConsumptionData create() => ConsumptionData._();
+  ConsumptionData createEmptyInstance() => create();
+  static $pb.PbList<ConsumptionData> createRepeated() => $pb.PbList<ConsumptionData>();
+  @$core.pragma('dart2js:noInline')
+  static ConsumptionData getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ConsumptionData>(create);
+  static ConsumptionData? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.double get hodometer => $_getN(0);
+  @$pb.TagNumber(1)
+  set hodometer($core.double v) { $_setFloat(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasHodometer() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearHodometer() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.double get trip => $_getN(1);
+  @$pb.TagNumber(2)
+  set trip($core.double v) { $_setFloat(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasTrip() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearTrip() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.double get hodometerConsumed => $_getN(2);
+  @$pb.TagNumber(3)
+  set hodometerConsumed($core.double v) { $_setFloat(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasHodometerConsumed() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearHodometerConsumed() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.double get tripConsumed => $_getN(3);
+  @$pb.TagNumber(4)
+  set tripConsumed($core.double v) { $_setFloat(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasTripConsumed() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearTripConsumed() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.double get hodometerFuelByDistance => $_getN(4);
+  @$pb.TagNumber(5)
+  set hodometerFuelByDistance($core.double v) { $_setFloat(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasHodometerFuelByDistance() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearHodometerFuelByDistance() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.double get tripFuelByDistance => $_getN(5);
+  @$pb.TagNumber(6)
+  set tripFuelByDistance($core.double v) { $_setFloat(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasTripFuelByDistance() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearTripFuelByDistance() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.double get currentSpeed => $_getN(6);
+  @$pb.TagNumber(7)
+  set currentSpeed($core.double v) { $_setFloat(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasCurrentSpeed() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearCurrentSpeed() => clearField(7);
+}
+
 class StreamData extends $pb.GeneratedMessage {
   factory StreamData({
     EcuData? ecuData,
+    ConsumptionData? consumptionData,
   }) {
     final $result = create();
     if (ecuData != null) {
       $result.ecuData = ecuData;
+    }
+    if (consumptionData != null) {
+      $result.consumptionData = consumptionData;
     }
     return $result;
   }
@@ -821,6 +959,7 @@ class StreamData extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StreamData', package: const $pb.PackageName(_omitMessageNames ? '' : 'DashElixirFlutter'), createEmptyInstance: create)
     ..aOM<EcuData>(1, _omitFieldNames ? '' : 'ecuData', subBuilder: EcuData.create)
+    ..aOM<ConsumptionData>(2, _omitFieldNames ? '' : 'consumptionData', subBuilder: ConsumptionData.create)
     ..hasRequiredFields = false
   ;
 
@@ -855,6 +994,17 @@ class StreamData extends $pb.GeneratedMessage {
   void clearEcuData() => clearField(1);
   @$pb.TagNumber(1)
   EcuData ensureEcuData() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  ConsumptionData get consumptionData => $_getN(1);
+  @$pb.TagNumber(2)
+  set consumptionData(ConsumptionData v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasConsumptionData() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearConsumptionData() => clearField(2);
+  @$pb.TagNumber(2)
+  ConsumptionData ensureConsumptionData() => $_ensure(1);
 }
 
 class Device extends $pb.GeneratedMessage {

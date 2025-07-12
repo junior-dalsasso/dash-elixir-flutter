@@ -1,8 +1,8 @@
 defmodule DashElixirFlutter.Serial do
   use GenServer
 
+  alias DashElixirFlutter.StreamDataBuilder
   alias DashElixirFlutter.StatusMotor
-  alias DashElixirFlutter.StreamData
   alias DashElixirFlutter.EcuData
   alias DashElixirFlutter.SerialParser
 
@@ -101,8 +101,8 @@ defmodule DashElixirFlutter.Serial do
 
       {:noreply, %{state | config: %{state.config | uart_pid: uart_pid}}}
     else
-      {:error, reason} ->
-        Logger.error("Failed to start UART: #{reason}")
+      {:error, _reason} ->
+        # Logger.error("Failed to start UART: #{reason}")
         schedule_reconnect()
         {:noreply, state}
     end
@@ -120,7 +120,7 @@ defmodule DashElixirFlutter.Serial do
   end
 
   def handle_info(:tick, %{config: %{uart_pid: uart_pid}} = state) when is_nil(uart_pid) do
-    Logger.warning("UART not initialized, skipping tick.")
+    # Logger.warning("UART not initialized, skipping tick.")
     schedule_tick()
     {:noreply, state}
   end
@@ -143,18 +143,15 @@ defmodule DashElixirFlutter.Serial do
         schedule_tick()
         {:noreply, state}
 
-      {:error, reason} ->
-        Logger.error("Erro ao ler dados: #{reason}")
+      {:error, _reason} ->
+        # Logger.error("Erro ao ler dados: #{reason}")
         schedule_tick()
         {:noreply, state}
     end
   end
 
   def handle_info(:update_stream, state) do
-    if Process.whereis(DashElixirFlutter.StreamServer) do
-      DashElixirFlutter.StreamServer.send_data(%StreamData{ecu_data: state.ecu_data})
-    end
-
+    StreamDataBuilder.update_fields(%{ecu_data: state.ecu_data})
     {:noreply, state}
   end
 

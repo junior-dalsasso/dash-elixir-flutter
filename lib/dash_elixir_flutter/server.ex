@@ -17,6 +17,24 @@ defmodule DashElixirFlutter.RPC.Server do
     Task.async(fn -> Process.sleep(:infinity) end) |> Task.await(:infinity)
   end
 
+  @spec start_calibration(DashElixirFlutter.Empty.t(), GRPC.Server.Stream.t()) :: no_return
+  def start_calibration(_request, _stream) do
+    DashElixirFlutter.Consumption.start_calibration()
+    %DashElixirFlutter.Empty{}
+  end
+
+  @spec reset_trip(DashElixirFlutter.Empty.t(), GRPC.Server.Stream.t()) :: no_return
+  def reset_trip(_request, _stream) do
+    DashElixirFlutter.Consumption.reset_trip()
+    %DashElixirFlutter.Empty{}
+  end
+
+  @spec reset_hodometer(DashElixirFlutter.Empty.t(), GRPC.Server.Stream.t()) :: no_return
+  def reset_hodometer(_request, _stream) do
+    DashElixirFlutter.Consumption.reset_hodometer()
+    %DashElixirFlutter.Empty{}
+  end
+
   @spec reboot_system(DashElixirFlutter.Empty.t(), GRPC.Server.Stream.t()) :: no_return
   def reboot_system(_request, _stream) do
     Nerves.Runtime.reboot()

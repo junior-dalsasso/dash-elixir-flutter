@@ -5,9 +5,16 @@ import "package:path_provider/path_provider.dart";
 import "../chart_config.dart";
 
 class PreferencesService {
-  static const _chartConfigsKey = "chart_configs";
+  static final PreferencesService _instance = PreferencesService._internal();
+  factory PreferencesService() => _instance;
+
+  PreferencesService._internal();
+
+  static PreferencesService get instance => _instance;
+
   late final File _prefsFile;
   late Map<String, dynamic> _prefsData;
+  static const _chartConfigsKey = "chart_configs";
 
   Future<void> init() async {
     try {

@@ -39,4 +39,16 @@ class API {
   static Future<ActionResult> connectDevice(Device device) async {
     return await _client!.tryConnectDevice(device);
   }
+
+  static Future<Empty> startCalibration() async {
+    return await _client!.startCalibration(Empty.create());
+  }
+
+  static Future<Empty> resetTrip() async {
+    return await _client!.resetTrip(Empty.create());
+  }
+
+  static Future<Empty> resetHodometer() async {
+    return await _client!.resetHodometer(Empty.create());
+  }
 }

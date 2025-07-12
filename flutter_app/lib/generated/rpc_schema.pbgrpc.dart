@@ -25,6 +25,18 @@ class RPCClient extends $grpc.Client {
       '/DashElixirFlutter.RPC/StreamInfo',
       ($0.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.StreamData.fromBuffer(value));
+  static final _$startCalibration = $grpc.ClientMethod<$0.Empty, $0.Empty>(
+      '/DashElixirFlutter.RPC/startCalibration',
+      ($0.Empty value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.Empty.fromBuffer(value));
+  static final _$resetTrip = $grpc.ClientMethod<$0.Empty, $0.Empty>(
+      '/DashElixirFlutter.RPC/resetTrip',
+      ($0.Empty value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.Empty.fromBuffer(value));
+  static final _$resetHodometer = $grpc.ClientMethod<$0.Empty, $0.Empty>(
+      '/DashElixirFlutter.RPC/resetHodometer',
+      ($0.Empty value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.Empty.fromBuffer(value));
   static final _$rebootSystem = $grpc.ClientMethod<$0.Empty, $0.Empty>(
       '/DashElixirFlutter.RPC/RebootSystem',
       ($0.Empty value) => value.writeToBuffer(),
@@ -46,6 +58,18 @@ class RPCClient extends $grpc.Client {
 
   $grpc.ResponseStream<$0.StreamData> streamInfo($0.Empty request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$streamInfo, $async.Stream.fromIterable([request]), options: options);
+  }
+
+  $grpc.ResponseFuture<$0.Empty> startCalibration($0.Empty request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$startCalibration, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.Empty> resetTrip($0.Empty request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$resetTrip, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.Empty> resetHodometer($0.Empty request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$resetHodometer, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.Empty> rebootSystem($0.Empty request, {$grpc.CallOptions? options}) {
@@ -74,6 +98,27 @@ abstract class RPCServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
         ($0.StreamData value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.Empty, $0.Empty>(
+        'startCalibration',
+        startCalibration_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
+        ($0.Empty value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.Empty, $0.Empty>(
+        'resetTrip',
+        resetTrip_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
+        ($0.Empty value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.Empty, $0.Empty>(
+        'resetHodometer',
+        resetHodometer_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
+        ($0.Empty value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.Empty, $0.Empty>(
         'RebootSystem',
         rebootSystem_Pre,
         false,
@@ -100,6 +145,18 @@ abstract class RPCServiceBase extends $grpc.Service {
     yield* streamInfo(call, await request);
   }
 
+  $async.Future<$0.Empty> startCalibration_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async {
+    return startCalibration(call, await request);
+  }
+
+  $async.Future<$0.Empty> resetTrip_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async {
+    return resetTrip(call, await request);
+  }
+
+  $async.Future<$0.Empty> resetHodometer_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async {
+    return resetHodometer(call, await request);
+  }
+
   $async.Future<$0.Empty> rebootSystem_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async {
     return rebootSystem(call, await request);
   }
@@ -113,6 +170,9 @@ abstract class RPCServiceBase extends $grpc.Service {
   }
 
   $async.Stream<$0.StreamData> streamInfo($grpc.ServiceCall call, $0.Empty request);
+  $async.Future<$0.Empty> startCalibration($grpc.ServiceCall call, $0.Empty request);
+  $async.Future<$0.Empty> resetTrip($grpc.ServiceCall call, $0.Empty request);
+  $async.Future<$0.Empty> resetHodometer($grpc.ServiceCall call, $0.Empty request);
   $async.Future<$0.Empty> rebootSystem($grpc.ServiceCall call, $0.Empty request);
   $async.Future<$0.DeviceList> listBluetoothDevices($grpc.ServiceCall call, $0.Empty request);
   $async.Future<$0.ActionResult> tryConnectDevice($grpc.ServiceCall call, $0.Device request);

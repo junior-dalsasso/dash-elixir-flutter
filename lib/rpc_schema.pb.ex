@@ -64,11 +64,28 @@ defmodule DashElixirFlutter.StatusMotor do
   field :ciclo_aquecimento, 4, type: :bool, json_name: "cicloAquecimento"
 end
 
+defmodule DashElixirFlutter.ConsumptionData do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  field :hodometer, 1, type: :float
+  field :trip, 2, type: :float
+  field :hodometer_consumed, 3, type: :float, json_name: "hodometerConsumed"
+  field :trip_consumed, 4, type: :float, json_name: "tripConsumed"
+  field :hodometer_fuel_by_distance, 5, type: :float, json_name: "hodometerFuelByDistance"
+  field :trip_fuel_by_distance, 6, type: :float, json_name: "tripFuelByDistance"
+  field :current_speed, 7, type: :float, json_name: "currentSpeed"
+end
+
 defmodule DashElixirFlutter.StreamData do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   field :ecu_data, 1, type: DashElixirFlutter.EcuData, json_name: "ecuData"
+
+  field :consumption_data, 2,
+    type: DashElixirFlutter.ConsumptionData,
+    json_name: "consumptionData"
 end
 
 defmodule DashElixirFlutter.Device do
@@ -107,6 +124,48 @@ defmodule DashElixirFlutter.RPC.Service do
         additional_bindings: [],
         response_body: "",
         pattern: {:get, "/streamInfo"},
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:startCalibration, DashElixirFlutter.Empty, DashElixirFlutter.Empty, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/startCalibration"},
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:resetTrip, DashElixirFlutter.Empty, DashElixirFlutter.Empty, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/resetTrip"},
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:resetHodometer, DashElixirFlutter.Empty, DashElixirFlutter.Empty, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/resetHodometer"},
         __unknown_fields__: []
       }
     }

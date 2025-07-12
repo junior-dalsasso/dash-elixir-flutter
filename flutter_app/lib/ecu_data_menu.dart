@@ -1,14 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api.dart';
 import 'package:flutter_app/generated/rpc_schema.pbgrpc.dart';
 import 'package:flutter_app/rpi_connection_btn.dart';
 import 'package:intl/intl.dart';
 
-class EcuDataMenu extends StatelessWidget {
+class EcuDataMenu extends StatefulWidget {
   final EcuData ecuData;
-  final DateTime now = DateTime.now();
+  final ConsumptionData consData;
 
-  EcuDataMenu({super.key, required this.ecuData});
+  const EcuDataMenu({super.key, required this.ecuData, required this.consData});
+
+  @override
+  State<EcuDataMenu> createState() => _EcuDataMenuState();
+}
+
+class _EcuDataMenuState extends State<EcuDataMenu> {
+  final DateTime now = DateTime.now();
+  bool isShowingHodometer = true;
 
   final ValueNotifier<EcuData?> ecuDataNotifier = ValueNotifier(null);
 
@@ -35,6 +45,93 @@ class EcuDataMenu extends StatelessWidget {
     );
   }
 
+  void resetValuesConfirm(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Limpar informações ${isShowingHodometer ? "do hodômetro?" : "da viagem?"}"),
+          content: const Text("Tem certeza que deseja limpar as informações de quilometragem e consumo?"),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+              child: const Text("Sim"),
+              onPressed: () =>
+                  {isShowingHodometer ? API.resetHodometer() : API.resetTrip(), Navigator.of(context).pop()},
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void calibrateModal(BuildContext context) {
+    late bool localIsCalibrating = false;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    ],
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Mantenha 40 km/h${localIsCalibrating ? "" : " e confirme no botão"}",
+                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 26),
+                          ElevatedButton.icon(
+                            onPressed: () => {
+                              setModalState(() => localIsCalibrating = true),
+                              API.startCalibration(),
+                              Timer(const Duration(seconds: 2), () {
+                                setModalState(() => localIsCalibrating = false);
+                                Navigator.pop(context);
+                              }),
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueGrey[800],
+                              minimumSize: const Size(440, 180),
+                            ),
+                            label: localIsCalibrating
+                                ? const SizedBox(height: 120.0, width: 120.0, child: CircularProgressIndicator())
+                                : const Text("Calibrar", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 56)),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Color _getBatteryColor(double value) {
     if (value > 13) return Colors.green;
     if (value > 12.2) return Colors.blue;
@@ -53,58 +150,58 @@ class EcuDataMenu extends StatelessWidget {
     return Colors.blue;
   }
 
-  Color _getTpsColor(double value) {
+  Color _getSpeedColor(double value) {
     if (value > 80) return Colors.red;
-    if (value > 40) return Colors.blue;
-    return Colors.green;
+    if (value > 40) return Colors.green;
+    return Colors.blue;
   }
 
   String getMotorStatus() {
-    if (ecuData.statusMotor.motorEmPartida) return "Motor em partida";
-    if (ecuData.statusMotor.cicloAquecimento) return "Motor aquecendo";
-    if (ecuData.statusMotor.motorPronto) return "Motor ligado";
+    if (widget.ecuData.statusMotor.motorEmPartida) return "Motor em partida";
+    if (widget.ecuData.statusMotor.cicloAquecimento) return "Motor aquecendo";
+    if (widget.ecuData.statusMotor.motorPronto) return "Motor ligado";
 
     return "";
   }
 
   String getMotorActions() {
-    if (ecuData.largPulsoBancada1 == 0 && ecuData.rpm > 500) return "Cut off ativo";
+    if (widget.ecuData.largPulsoBancada1 == 0 && widget.ecuData.rpm > 500) return "Cut off ativo";
 
     return "";
   }
 
-  Map<String, dynamic> ecuDataToMap(EcuData data) {
+  Map<String, dynamic> ecuDataToMap(StreamData data) {
     return {
-      'Segundos ECU ligada': data.segundosMotorLigado,
-      'Largura pulso bancada 01': data.largPulsoBancada1,
-      'Largura pulso bancada 02': data.largPulsoBancada2,
-      'RPM': data.rpm,
-      'Avanço ignição': data.avancoIgnicao,
-      'AFR alvo bancada 01': data.afrAlvoBancada1,
-      'AFR alvo bancada 02': data.afrAlvoBancada2,
-      'Pressão coletor': data.pressaoColetor,
-      'Temperatura ar coletor': data.tempArColetor,
-      'Temperatura água': data.tempAgua,
-      'TPS': data.tps,
-      'Tensão bateria': data.tensaoBateria,
-      'Sonda banco 01': data.sondaBanco1,
-      'Sonda banco 02': data.sondaBanco2,
-      'Correção banco 01': data.correcaoBanco1,
-      'Correção banco 02': data.correcaoBanco2,
-      'Correção ar': data.correcaoAr,
-      'Correção aquecimento': data.correcaoAquecimento,
-      'Correção rápida': data.correcaoRapida,
-      'Cutoff TPS': data.cutoffTps,
-      'Correção combustível baro': data.correcaoCombsBaro,
-      'Correção combustível total': data.correcaoCombsTotal,
-      'Valor VE bancada 01': data.valorVeBancada1,
-      'Valor VE bancada 02': data.valorVeBancada2,
-      'Controle marcha lenta': data.controleMarchaLenta,
-      'Avanço ignição frio': data.avancoIgnicaoFrio,
-      'TPS variação': data.tpsVariacao,
-      'MAP variação': data.mapVariacao,
-      'Dwell': data.dwell,
-      'Carga combustível': data.cargaCombustivel,
+      "Segundos ECU ligada": data.ecuData.segundosMotorLigado,
+      "Largura pulso bancada 01": data.ecuData.largPulsoBancada1,
+      "Largura pulso bancada 02": data.ecuData.largPulsoBancada2,
+      "RPM": data.ecuData.rpm,
+      "Avanço ignição": data.ecuData.avancoIgnicao,
+      "AFR alvo bancada 01": data.ecuData.afrAlvoBancada1,
+      "AFR alvo bancada 02": data.ecuData.afrAlvoBancada2,
+      "Pressão coletor": data.ecuData.pressaoColetor,
+      "Temperatura ar coletor": data.ecuData.tempArColetor,
+      "Temperatura água": data.ecuData.tempAgua,
+      "TPS": data.ecuData.tps,
+      "Tensão bateria": data.ecuData.tensaoBateria,
+      "Sonda banco 01": data.ecuData.sondaBanco1,
+      "Sonda banco 02": data.ecuData.sondaBanco2,
+      "Correção banco 01": data.ecuData.correcaoBanco1,
+      "Correção banco 02": data.ecuData.correcaoBanco2,
+      "Correção ar": data.ecuData.correcaoAr,
+      "Correção aquecimento": data.ecuData.correcaoAquecimento,
+      "Correção rápida": data.ecuData.correcaoRapida,
+      "Cutoff TPS": data.ecuData.cutoffTps,
+      "Correção combustível baro": data.ecuData.correcaoCombsBaro,
+      "Correção combustível total": data.ecuData.correcaoCombsTotal,
+      "Valor VE bancada 01": data.ecuData.valorVeBancada1,
+      "Valor VE bancada 02": data.ecuData.valorVeBancada2,
+      "Controle marcha lenta": data.ecuData.controleMarchaLenta,
+      "Avanço ignição frio": data.ecuData.avancoIgnicaoFrio,
+      "TPS variação": data.ecuData.tpsVariacao,
+      "MAP variação": data.ecuData.mapVariacao,
+      "Dwell": data.ecuData.dwell,
+      "Carga combustível": data.ecuData.cargaCombustivel,
       // 'Atualizações Amc': data.atualizacoesAmc,
       // 'kpaixNaoUsado': data.kpaixNaoUsado,
       // 'leituraTpsAdc': data.leituraTpsAdc,
@@ -115,14 +212,21 @@ class EcuDataMenu extends StatelessWidget {
       // 'Erro tempo ignição %': data.erroTempoIgnicaoPct,
       // 'tempoEntrePulsosUs': data.tempoEntrePulsosUs,
       // 'combustivelParedeUs': data.combustivelParedeUs,
-      'Entrada analógica 0': data.entradaAnalogica0,
-      'Entrada analógica 1': data.entradaAnalogica1,
-      'Entrada analógica 2': data.entradaAnalogica2,
+      "Entrada analógica 0": data.ecuData.entradaAnalogica0,
+      "Entrada analógica 1": data.ecuData.entradaAnalogica1,
+      "Entrada analógica 2": data.ecuData.entradaAnalogica2,
       // 'connected': data.connected,
-      'Motor pronto': data.statusMotor.motorPronto,
-      'Motor dando partida': data.statusMotor.motorEmPartida,
-      'Motor partida com enriquecimento': data.statusMotor.enriquecimentoPartida,
-      'Motor aquecendo': data.statusMotor.cicloAquecimento,
+      "Motor pronto": data.ecuData.statusMotor.motorPronto,
+      "Motor dando partida": data.ecuData.statusMotor.motorEmPartida,
+      "Motor partida com enriquecimento": data.ecuData.statusMotor.enriquecimentoPartida,
+      "Motor aquecendo": data.ecuData.statusMotor.cicloAquecimento,
+      "Hodômetro": data.consumptionData.hodometer.toStringAsFixed(2),
+      "Consumo total": data.consumptionData.hodometerConsumed.toStringAsFixed(2),
+      "Consumo médio total": data.consumptionData.hodometerFuelByDistance.toStringAsFixed(2),
+      "Viagem": data.consumptionData.trip.toStringAsFixed(2),
+      "Consumo viagem": data.consumptionData.tripConsumed.toStringAsFixed(2),
+      "Consumo médio viagem": data.consumptionData.tripFuelByDistance.toStringAsFixed(2),
+      "Velocidade atual": data.consumptionData.currentSpeed.toStringAsFixed(2),
     };
   }
 
@@ -132,7 +236,7 @@ class EcuDataMenu extends StatelessWidget {
       width: 200,
       color: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -146,81 +250,147 @@ class EcuDataMenu extends StatelessWidget {
                       DateFormat("HH:mm:ss").format(now),
                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                     ),
-                    RpiConnectionBtn(isConnected: ecuData.connected, context: context)
+                    RpiConnectionBtn(isConnected: widget.ecuData.connected, context: context)
                   ],
                 ),
                 Text(
                   DateFormat("dd/MM/yyyy").format(now),
-                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, height: 0.5),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
                 Row(
                   children: [
-                    Icon(Icons.electric_car, color: _getBatteryColor(ecuData.tensaoBateria)),
+                    Icon(Icons.electric_car, color: _getBatteryColor(widget.ecuData.tensaoBateria)),
                     const SizedBox(width: 8),
                     Text(
-                      "${ecuData.tensaoBateria.toStringAsFixed(2)} V",
+                      "${widget.ecuData.tensaoBateria.toStringAsFixed(2)} V",
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    Icon(Icons.speed, color: _getRpmColor(ecuData.rpm)),
+                    Icon(Icons.speed, color: _getRpmColor(widget.ecuData.rpm)),
                     const SizedBox(width: 8),
                     Text(
-                      "${ecuData.rpm.toInt()} RPM",
+                      "${widget.ecuData.rpm.toInt()} RPM",
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    Icon(Icons.thermostat, color: _getTempColor(ecuData.tempAgua)),
+                    Icon(Icons.thermostat, color: _getTempColor(widget.ecuData.tempAgua)),
                     const SizedBox(width: 8),
                     Text(
-                      "${ecuData.tempAgua.toStringAsFixed(2)} °C",
+                      "${widget.ecuData.tempAgua.toStringAsFixed(2)} °C",
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    Icon(Icons.airlines_outlined, color: _getTpsColor(ecuData.tps)),
+                    Icon(Icons.rocket_launch, color: _getSpeedColor(widget.consData.currentSpeed)),
                     const SizedBox(width: 8),
-                    Text(
-                      "${ecuData.tps > 200 ? 0 : ecuData.tps.toInt()} %",
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                getMotorStatus().isNotEmpty
-                    ? Center(
-                        child: Chip(
-                          backgroundColor: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
-                          padding: const EdgeInsets.all(1),
-                          label: Text(getMotorStatus()),
-                          labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          widget.consData.currentSpeed.toStringAsFixed(2),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
-                      )
-                    : Container(),
+                        const Text(" km/h", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, height: 1.9)),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(isShowingHodometer ? Icons.directions_car : Icons.sports_score, color: Colors.blue),
+                    const SizedBox(width: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          (isShowingHodometer
+                              ? widget.consData.hodometer.toInt().toString()
+                              : widget.consData.trip.toStringAsFixed(2)),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        const Text(" km", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, height: 1.9)),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(isShowingHodometer ? Icons.local_gas_station : Icons.local_gas_station_outlined,
+                        color: Colors.red),
+                    const SizedBox(width: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          (isShowingHodometer
+                                  ? widget.consData.hodometerFuelByDistance
+                                  : widget.consData.tripFuelByDistance)
+                              .toStringAsFixed(1),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        const Text(" km/L", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, height: 1.9)),
+                      ],
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 10),
-                getMotorActions().isNotEmpty
-                    ? Center(
-                        child: Chip(
-                          backgroundColor: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
-                          padding: const EdgeInsets.all(1),
-                          label: Text(getMotorActions()),
-                          labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    : Container(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => setState(() => isShowingHodometer = !isShowingHodometer),
+                      style: ElevatedButton.styleFrom(minimumSize: const Size(50, 50), padding: EdgeInsets.zero),
+                      child: const Icon(Icons.swap_horiz, size: 22),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => calibrateModal(context),
+                      style: ElevatedButton.styleFrom(minimumSize: const Size(50, 50), padding: EdgeInsets.zero),
+                      child: const Icon(Icons.tune, size: 22),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => resetValuesConfirm(context),
+                      style: ElevatedButton.styleFrom(minimumSize: const Size(50, 50), padding: EdgeInsets.zero),
+                      child: const Icon(Icons.cleaning_services, size: 22),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                if (getMotorStatus().isNotEmpty) ...[
+                  Center(
+                    child: Chip(
+                      backgroundColor: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
+                      padding: const EdgeInsets.all(1),
+                      label: Text(getMotorStatus()),
+                      labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+                const SizedBox(height: 6),
+                if (getMotorActions().isNotEmpty) ...[
+                  Center(
+                    child: Chip(
+                      backgroundColor: Theme.of(context).primaryColorLight.withValues(alpha: 0.2),
+                      padding: const EdgeInsets.all(1),
+                      label: Text(getMotorActions()),
+                      labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ]
               ],
             ),
-            Column(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                ElevatedButton.icon(
+                ElevatedButton(
                   onPressed: () {
                     showModalBottomSheet<void>(
                       context: context,
@@ -231,7 +401,7 @@ class EcuDataMenu extends StatelessWidget {
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) return const CircularProgressIndicator();
 
-                            final mappedData = ecuDataToMap(snapshot.data?.ecuData ?? EcuData());
+                            final mappedData = ecuDataToMap(snapshot.data ?? StreamData());
 
                             return DraggableScrollableSheet(
                               expand: false,
@@ -301,16 +471,13 @@ class EcuDataMenu extends StatelessWidget {
                       },
                     );
                   },
-                  icon: const Icon(Icons.remove_red_eye),
-                  label: const Text("Visualizar dados", style: TextStyle(fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(minimumSize: const Size(180, 50)),
+                  style: ElevatedButton.styleFrom(minimumSize: const Size(70, 50), padding: EdgeInsets.zero),
+                  child: const Icon(Icons.remove_red_eye, size: 30),
                 ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
+                ElevatedButton(
                   onPressed: () => showRebootConfirm(context),
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: const Text("Reiniciar", style: TextStyle(fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(minimumSize: const Size(180, 50)),
+                  style: ElevatedButton.styleFrom(minimumSize: const Size(70, 50), padding: EdgeInsets.zero),
+                  child: const Icon(Icons.refresh_rounded, size: 30),
                 ),
               ],
             ),
