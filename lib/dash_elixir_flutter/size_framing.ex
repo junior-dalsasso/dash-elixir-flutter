@@ -35,8 +35,13 @@ defmodule DashElixirFlutter.SizeFraming do
 
   defp process_data(<<>>, frames), do: {<<>>, frames}
 
-  defp process_data(<<size::16, _flag::8, data::binary-size(size - 1), _crc::32>>, frames),
-    do: process_data(<<>>, frames ++ [data])
+  defp process_data(<<size::16, data::binary-size(size), crc::32>>, frames) do
+    if (:erlang.crc32(data) == crc) do
+      process_data(<<>>, frames ++ [data])  # Mensagem recebida com sucesso
+    else
+      process_data(<<>>, frames)            # CRC inválido! Descartando pacote.
+    end
+  end
 
   defp process_data(<<size::16, rest::binary>>, frames), do: {<<size::16, rest::binary>>, frames}
 

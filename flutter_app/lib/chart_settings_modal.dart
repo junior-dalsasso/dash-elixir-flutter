@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_app/chart_config.dart";
+import "package:flutter_app/ecu_metrics.dart";
 import "package:flutter_app/preferences_service.dart";
 import "package:virtual_keyboard_custom_layout/virtual_keyboard_custom_layout.dart";
 
@@ -284,50 +285,13 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
     );
   }
 
-  List<Map<String, String>> _getMetrics() {
-    return [
-      {"value": "segundosMotorLigado", "label": "Segundos ECU ligada"},
-      {"value": "largPulsoBancada1", "label": "Largura pulso bancada 01"},
-      {"value": "largPulsoBancada2", "label": "Largura pulso bancada 02"},
-      {"value": "rpm", "label": "RPM"},
-      {"value": "avancoIgnicao", "label": "Avanço ignição"},
-      {"value": "afrAlvoBancada1", "label": "AFR alvo bancada 01"},
-      {"value": "afrAlvoBancada2", "label": "AFR alvo bancada 02"},
-      {"value": "pressaoColetor", "label": "Pressão coletor"},
-      {"value": "tempArColetor", "label": "Temperatura ar coletor"},
-      {"value": "tempAgua", "label": "Temperatura água"},
-      {"value": "tps", "label": "TPS"},
-      {"value": "tensaoBateria", "label": "Tensão bateria"},
-      {"value": "sondaBanco1", "label": "Sonda banco 01"},
-      {"value": "sondaBanco2", "label": "Sonda banco 02"},
-      {"value": "correcaoBanco1", "label": "Correção banco 01"},
-      {"value": "correcaoBanco2", "label": "Correção banco 02"},
-      {"value": "correcaoAr", "label": "Correção ar"},
-      {"value": "correcaoAquecimento", "label": "Correção aquecimento"},
-      {"value": "correcaoRapida", "label": "Correção rápida"},
-      {"value": "cutoffTps", "label": "Cutoff TPS"},
-      {"value": "correcaoCombsBaro", "label": "Correção combustível baro"},
-      {"value": "correcaoCombsTotal", "label": "Correção combustível total"},
-      {"value": "valorVeBancada1", "label": "Valor VE bancada 01"},
-      {"value": "valorVeBancada2", "label": "Valor VE bancada 02"},
-      {"value": "controleMarchaLenta", "label": "Controle marcha lenta"},
-      {"value": "avancoIgnicaoFrio", "label": "Avanço ignição frio"},
-      {"value": "tpsVariacao", "label": "TPS variação"},
-      {"value": "mapVariacao", "label": "MAP variação"},
-      {"value": "dwell", "label": "Dwell"},
-      {"value": "cargaCombustivel", "label": "Carga combustível"},
-      {"value": "entradaAnalogica0", "label": "Entrada analógica 0"},
-      {"value": "entradaAnalogica1", "label": "Entrada analógica 1"},
-      {"value": "entradaAnalogica2", "label": "Entrada analógica 2"},
-    ];
-  }
-
   List<DropdownMenuItem<String>> _buildAvailableMetrics() {
-    return _getMetrics()
+    return ecuMetrics
+        .where((x) => x.canShowChart)
         .map(
           (metric) => DropdownMenuItem<String>(
-            value: metric["value"],
-            child: Text(metric["label"]!),
+            value: metric.value,
+            child: Text(metric.label),
           ),
         )
         .toList();
@@ -360,7 +324,7 @@ class _ChartSettingsModalState extends State<ChartSettingsModal> {
 
     final newConfig = ChartConfig(
       chartType: chartTypeController.text,
-      metricName: _getMetrics().firstWhere((x) => x["value"] == metricId)["label"]!,
+      metricName: ecuMetrics.firstWhere((x) => x.value == metricId).label,
       metricId: metricIdController.text,
       minValue: min,
       maxValue: max,

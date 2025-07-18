@@ -20,7 +20,9 @@ defmodule DashElixirFlutter.Consumption do
   @speed_reference Decimal.from_float(11.1111)
 
   # 80 ul per pulse * 625 pulses = 50 ML
-  @pulses_to_50_ml Decimal.new(625)
+  # @pulses_to_50_ml Decimal.new(625)
+  # 80 ul per pulse * 125 pulses = 10 ML
+  @pulses_to_10_ml Decimal.new(125)
 
   # convert ul to Liters
   @ul_to_L Decimal.div(80, 1_000_000)
@@ -142,7 +144,7 @@ defmodule DashElixirFlutter.Consumption do
     stored_pulses = AuxValues.get_by_key!("pulsesConsume")
 
     state =
-      if Decimal.gte?(state.consumed_pulses, @pulses_to_50_ml) do
+      if Decimal.gte?(state.consumed_pulses, @pulses_to_10_ml) do
         consumed_in_l = Decimal.mult(state.consumed_pulses, @ul_to_L)
 
         %{
@@ -186,14 +188,20 @@ defmodule DashElixirFlutter.Consumption do
     time_diff_seconds = (now - state.last_speed_calc_at) / 1000.0
 
     state =
-      if time_diff_seconds >= 0.8 do
+      if time_diff_seconds >= 0.4 do
         current_ppm = Decimal.mult(state.speed_pulses, state.pulses_per_meter)
         scale = Decimal.div(Decimal.from_float(3.6), Decimal.from_float(time_diff_seconds))
         new_speed = Decimal.mult(current_ppm, scale)
 
-        # Logger.debug("#{new_speed}")
+        alpha = 0.2 # Peso da leitura nova
 
-        %{state | last_speed_calc_at: now, current_speed: new_speed, speed_pulses: 0}
+        smoothed_speed =
+          Decimal.add(
+            Decimal.mult(Decimal.from_float(alpha), new_speed),
+            Decimal.mult(Decimal.from_float(1.0 - alpha), state.current_speed)
+          )
+
+        %{state | last_speed_calc_at: now, current_speed: smoothed_speed, speed_pulses: 0}
       else
         state
       end

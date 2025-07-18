@@ -7,51 +7,111 @@ defmodule DashElixirFlutter.EcuData do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
-  field :segundos_motor_ligado, 1, type: :float, json_name: "segundosMotorLigado"
-  field :larg_pulso_bancada_1, 2, type: :float, json_name: "largPulsoBancada1"
-  field :larg_pulso_bancada_2, 3, type: :float, json_name: "largPulsoBancada2"
+  field :seconds, 1, type: :float
+  field :pulseWidth1, 2, type: :float
+  field :pulseWidth2, 3, type: :float
   field :rpm, 4, type: :float
-  field :avanco_ignicao, 5, type: :float, json_name: "avancoIgnicao"
-  field :status_motor, 6, type: DashElixirFlutter.StatusMotor, json_name: "statusMotor"
-  field :afr_alvo_bancada_1, 7, type: :float, json_name: "afrAlvoBancada1"
-  field :afr_alvo_bancada_2, 8, type: :float, json_name: "afrAlvoBancada2"
-  field :pressao_coletor, 9, type: :float, json_name: "pressaoColetor"
-  field :temp_ar_coletor, 10, type: :float, json_name: "tempArColetor"
-  field :temp_agua, 11, type: :float, json_name: "tempAgua"
-  field :tps, 12, type: :float
-  field :tensao_bateria, 13, type: :float, json_name: "tensaoBateria"
-  field :sonda_banco_1, 14, type: :float, json_name: "sondaBanco1"
-  field :sonda_banco_2, 15, type: :float, json_name: "sondaBanco2"
-  field :correcao_banco_1, 16, type: :float, json_name: "correcaoBanco1"
-  field :correcao_banco_2, 17, type: :float, json_name: "correcaoBanco2"
-  field :correcao_ar, 18, type: :float, json_name: "correcaoAr"
-  field :correcao_aquecimento, 19, type: :float, json_name: "correcaoAquecimento"
-  field :correcao_rapida, 20, type: :float, json_name: "correcaoRapida"
-  field :cutoff_tps, 21, type: :float, json_name: "cutoffTps"
-  field :correcao_combs_baro, 22, type: :float, json_name: "correcaoCombsBaro"
-  field :correcao_combs_total, 23, type: :float, json_name: "correcaoCombsTotal"
-  field :valor_ve_bancada_1, 24, type: :float, json_name: "valorVeBancada1"
-  field :valor_ve_bancada_2, 25, type: :float, json_name: "valorVeBancada2"
-  field :controle_marcha_lenta, 26, type: :float, json_name: "controleMarchaLenta"
-  field :avanco_ignicao_frio, 27, type: :float, json_name: "avancoIgnicaoFrio"
-  field :tps_variacao, 28, type: :float, json_name: "tpsVariacao"
-  field :map_variacao, 29, type: :float, json_name: "mapVariacao"
-  field :dwell, 30, type: :float
-  field :carga_combustivel, 31, type: :float, json_name: "cargaCombustivel"
-  field :atualizacoes_amc, 32, type: :uint32, json_name: "atualizacoesAmc"
-  field :kpaix_nao_usado, 33, type: :uint32, json_name: "kpaixNaoUsado"
-  field :leitura_tps_adc, 34, type: :float, json_name: "leituraTpsAdc"
-  field :carga_combustivel_alg2, 35, type: :float, json_name: "cargaCombustivelAlg2"
-  field :carga_ignicao_alg1, 36, type: :float, json_name: "cargaIgnicaoAlg1"
-  field :carga_ignicao_alg2, 37, type: :float, json_name: "cargaIgnicaoAlg2"
-  field :contador_sincronismo, 38, type: :uint32, json_name: "contadorSincronismo"
-  field :erro_tempo_ignicao_pct, 39, type: :float, json_name: "erroTempoIgnicaoPct"
-  field :tempo_entre_pulsos_us, 40, type: :uint32, json_name: "tempoEntrePulsosUs"
-  field :combustivel_parede_us, 41, type: :uint32, json_name: "combustivelParedeUs"
-  field :entrada_analogica_0, 42, type: :float, json_name: "entradaAnalogica0"
-  field :entrada_analogica_1, 43, type: :float, json_name: "entradaAnalogica1"
-  field :entrada_analogica_2, 44, type: :float, json_name: "entradaAnalogica2"
-  field :connected, 45, type: :bool
+  field :advance, 5, type: :float
+  field :squirt, 6, type: :float
+  field :engine, 7, type: DashElixirFlutter.StatusMotor
+  field :afrtgt1, 8, type: :float
+  field :afrtgt2, 9, type: :float
+  field :wbo2_en1, 10, type: :float, json_name: "wbo2En1"
+  field :wbo2_en2, 11, type: :float, json_name: "wbo2En2"
+  field :barometer, 12, type: :float
+  field :map, 13, type: :float
+  field :mat, 14, type: :float
+  field :coolant, 15, type: :float
+  field :tps, 16, type: :float
+  field :batteryVoltage, 17, type: :float
+  field :afr1, 18, type: :float
+  field :afr2, 19, type: :float
+  field :knock, 20, type: :float
+  field :egoCorrection1, 21, type: :float
+  field :egoCorrection2, 22, type: :float
+  field :airCorrection, 23, type: :float
+  field :warmupEnrich, 24, type: :float
+  field :accelEnrich, 25, type: :float
+  field :tpsfuelcut, 26, type: :float
+  field :baroCorrection, 27, type: :float
+  field :gammaEnrich, 28, type: :float
+  field :veCurr1, 29, type: :float
+  field :veCurr2, 30, type: :float
+  field :iacstep, 31, type: :float
+  field :coldAdvDeg, 32, type: :float
+  field :tpsDot, 33, type: :float
+  field :mapDot, 34, type: :float
+  field :dwell, 35, type: :float
+  field :mafload, 36, type: :float
+  field :fuelload, 37, type: :float
+  field :fuelCorrection, 38, type: :float
+  field :portStatus, 39, type: :float
+  field :knockRetard, 40, type: :float
+  field :eaeFuelCorr1, 41, type: :float
+  field :egoV, 42, type: :float
+  field :egoV2, 43, type: :float
+  field :status1, 44, type: :float
+  field :status2, 45, type: :float
+  field :status3, 46, type: :float
+  field :status4, 47, type: :float
+  field :looptime, 48, type: :float
+  field :status5, 49, type: :float
+  field :tpsADC, 50, type: :float
+  field :fuelload2, 51, type: :float
+  field :ignload, 52, type: :float
+  field :ignload2, 53, type: :float
+  field :synccnt, 54, type: :float
+  field :timing_err, 55, type: :float, json_name: "timingErr"
+  field :deltaT, 56, type: :float
+  field :wallfuel1, 57, type: :float
+  field :wallfuel2, 58, type: :float
+  field :eaeFuelCorr2, 59, type: :float
+  field :boostduty, 60, type: :float
+  field :syncreason, 61, type: :float
+  field :user0, 62, type: :float
+  field :inj_adv1, 63, type: :float, json_name: "injAdv1"
+  field :inj_adv2, 64, type: :float, json_name: "injAdv2"
+  field :pulseWidth3, 65, type: :float
+  field :pulseWidth4, 66, type: :float
+  field :vetrim1curr, 67, type: :float
+  field :vetrim2curr, 68, type: :float
+  field :vetrim3curr, 69, type: :float
+  field :vetrim4curr, 70, type: :float
+  field :maf, 71, type: :float
+  field :eaeload1, 72, type: :float
+  field :afrload1, 73, type: :float
+  field :rpmDot, 74, type: :float
+  field :gpioport0, 75, type: :float
+  field :gpioport1, 76, type: :float
+  field :gpioport2, 77, type: :float
+  field :cl_idle_targ_rpm, 78, type: :float, json_name: "clIdleTargRpm"
+  field :maf_volts, 79, type: :float, json_name: "mafVolts"
+  field :airtemp, 80, type: :float
+  field :dwell_trl, 81, type: :float, json_name: "dwellTrl"
+  field :fuel_pct, 82, type: :float, json_name: "fuelPct"
+  field :boost_targ, 83, type: :float, json_name: "boostTarg"
+  field :ext_advance, 84, type: :float, json_name: "extAdvance"
+  field :base_advance, 85, type: :float, json_name: "baseAdvance"
+  field :idle_cor_advance, 86, type: :float, json_name: "idleCorAdvance"
+  field :mat_retard, 87, type: :float, json_name: "matRetard"
+  field :flex_advance, 88, type: :float, json_name: "flexAdvance"
+  field :adv1, 89, type: :float
+  field :adv2, 90, type: :float
+  field :adv3, 91, type: :float
+  field :revlim_retard, 92, type: :float, json_name: "revlimRetard"
+  field :nitrous_retard, 93, type: :float, json_name: "nitrousRetard"
+  field :deadtime1, 94, type: :float
+  field :n2o_addfuel, 95, type: :float, json_name: "n2oAddfuel"
+  field :portbde, 96, type: :float
+  field :portam, 97, type: :float
+  field :portt, 98, type: :float
+  field :can_error_cnt, 99, type: :float, json_name: "canErrorCnt"
+  field :can_error, 100, type: :float, json_name: "canError"
+  field :oil, 101, type: :float
+  field :fuel, 102, type: :float
+  field :runsecs, 103, type: :float
+  field :start_retard, 104, type: :float, json_name: "startRetard"
+  field :connected, 105, type: :bool
 end
 
 defmodule DashElixirFlutter.StatusMotor do

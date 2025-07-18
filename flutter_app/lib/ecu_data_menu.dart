@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api.dart';
+import 'package:flutter_app/ecu_metrics.dart';
 import 'package:flutter_app/generated/rpc_schema.pbgrpc.dart';
 import 'package:flutter_app/rpi_connection_btn.dart';
 import 'package:intl/intl.dart';
@@ -157,77 +158,17 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
   }
 
   String getMotorStatus() {
-    if (widget.ecuData.statusMotor.motorEmPartida) return "Motor em partida";
-    if (widget.ecuData.statusMotor.cicloAquecimento) return "Motor aquecendo";
-    if (widget.ecuData.statusMotor.motorPronto) return "Motor ligado";
+    if (widget.ecuData.engine.motorEmPartida) return "Motor em partida";
+    if (widget.ecuData.engine.cicloAquecimento) return "Motor aquecendo";
+    if (widget.ecuData.engine.motorPronto) return "Motor ligado";
 
     return "";
   }
 
   String getMotorActions() {
-    if (widget.ecuData.largPulsoBancada1 == 0 && widget.ecuData.rpm > 500) return "Cut off ativo";
+    if (widget.ecuData.pulseWidth1 == 0 && widget.ecuData.rpm > 500) return "Cut off ativo";
 
     return "";
-  }
-
-  Map<String, dynamic> ecuDataToMap(StreamData data) {
-    return {
-      "Segundos ECU ligada": data.ecuData.segundosMotorLigado,
-      "Largura pulso bancada 01": data.ecuData.largPulsoBancada1,
-      "Largura pulso bancada 02": data.ecuData.largPulsoBancada2,
-      "RPM": data.ecuData.rpm,
-      "Avanço ignição": data.ecuData.avancoIgnicao,
-      "AFR alvo bancada 01": data.ecuData.afrAlvoBancada1,
-      "AFR alvo bancada 02": data.ecuData.afrAlvoBancada2,
-      "Pressão coletor": data.ecuData.pressaoColetor,
-      "Temperatura ar coletor": data.ecuData.tempArColetor,
-      "Temperatura água": data.ecuData.tempAgua,
-      "TPS": data.ecuData.tps,
-      "Tensão bateria": data.ecuData.tensaoBateria,
-      "Sonda banco 01": data.ecuData.sondaBanco1,
-      "Sonda banco 02": data.ecuData.sondaBanco2,
-      "Correção banco 01": data.ecuData.correcaoBanco1,
-      "Correção banco 02": data.ecuData.correcaoBanco2,
-      "Correção ar": data.ecuData.correcaoAr,
-      "Correção aquecimento": data.ecuData.correcaoAquecimento,
-      "Correção rápida": data.ecuData.correcaoRapida,
-      "Cutoff TPS": data.ecuData.cutoffTps,
-      "Correção combustível baro": data.ecuData.correcaoCombsBaro,
-      "Correção combustível total": data.ecuData.correcaoCombsTotal,
-      "Valor VE bancada 01": data.ecuData.valorVeBancada1,
-      "Valor VE bancada 02": data.ecuData.valorVeBancada2,
-      "Controle marcha lenta": data.ecuData.controleMarchaLenta,
-      "Avanço ignição frio": data.ecuData.avancoIgnicaoFrio,
-      "TPS variação": data.ecuData.tpsVariacao,
-      "MAP variação": data.ecuData.mapVariacao,
-      "Dwell": data.ecuData.dwell,
-      "Carga combustível": data.ecuData.cargaCombustivel,
-      // 'Atualizações Amc': data.atualizacoesAmc,
-      // 'kpaixNaoUsado': data.kpaixNaoUsado,
-      // 'leituraTpsAdc': data.leituraTpsAdc,
-      // 'cargaCombustivelAlg2': data.cargaCombustivelAlg2,
-      // 'cargaIgnicaoAlg1': data.cargaIgnicaoAlg1,
-      // 'cargaIgnicaoAlg2': data.cargaIgnicaoAlg2,
-      // 'Contador sincronismo': data.contadorSincronismo,
-      // 'Erro tempo ignição %': data.erroTempoIgnicaoPct,
-      // 'tempoEntrePulsosUs': data.tempoEntrePulsosUs,
-      // 'combustivelParedeUs': data.combustivelParedeUs,
-      "Entrada analógica 0": data.ecuData.entradaAnalogica0,
-      "Entrada analógica 1": data.ecuData.entradaAnalogica1,
-      "Entrada analógica 2": data.ecuData.entradaAnalogica2,
-      // 'connected': data.connected,
-      "Motor pronto": data.ecuData.statusMotor.motorPronto,
-      "Motor dando partida": data.ecuData.statusMotor.motorEmPartida,
-      "Motor partida com enriquecimento": data.ecuData.statusMotor.enriquecimentoPartida,
-      "Motor aquecendo": data.ecuData.statusMotor.cicloAquecimento,
-      "Hodômetro": data.consumptionData.hodometer.toStringAsFixed(2),
-      "Consumo total": data.consumptionData.hodometerConsumed.toStringAsFixed(2),
-      "Consumo médio total": data.consumptionData.hodometerFuelByDistance.toStringAsFixed(2),
-      "Viagem": data.consumptionData.trip.toStringAsFixed(2),
-      "Consumo viagem": data.consumptionData.tripConsumed.toStringAsFixed(2),
-      "Consumo médio viagem": data.consumptionData.tripFuelByDistance.toStringAsFixed(2),
-      "Velocidade atual": data.consumptionData.currentSpeed.toStringAsFixed(2),
-    };
   }
 
   @override
@@ -260,10 +201,10 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
                 const SizedBox(height: 14),
                 Row(
                   children: [
-                    Icon(Icons.electric_car, color: _getBatteryColor(widget.ecuData.tensaoBateria)),
+                    Icon(Icons.electric_car, color: _getBatteryColor(widget.ecuData.batteryVoltage)),
                     const SizedBox(width: 8),
                     Text(
-                      "${widget.ecuData.tensaoBateria.toStringAsFixed(2)} V",
+                      "${widget.ecuData.batteryVoltage.toStringAsFixed(2)} V",
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -280,10 +221,10 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
                 ),
                 Row(
                   children: [
-                    Icon(Icons.thermostat, color: _getTempColor(widget.ecuData.tempAgua)),
+                    Icon(Icons.thermostat, color: _getTempColor(widget.ecuData.coolant)),
                     const SizedBox(width: 8),
                     Text(
-                      "${widget.ecuData.tempAgua.toStringAsFixed(2)} °C",
+                      "${widget.ecuData.coolant.toStringAsFixed(2)} °C",
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -296,7 +237,7 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          widget.consData.currentSpeed.toStringAsFixed(2),
+                          widget.consData.currentSpeed.toStringAsFixed(0),
                           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                         const Text(" km/h", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, height: 1.9)),
@@ -342,28 +283,28 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 6),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ElevatedButton(
                       onPressed: () => setState(() => isShowingHodometer = !isShowingHodometer),
-                      style: ElevatedButton.styleFrom(minimumSize: const Size(50, 50), padding: EdgeInsets.zero),
-                      child: const Icon(Icons.swap_horiz, size: 22),
+                      style: ElevatedButton.styleFrom(minimumSize: const Size(60, 60), padding: EdgeInsets.zero),
+                      child: const Icon(Icons.swap_horiz, size: 28),
                     ),
                     ElevatedButton(
                       onPressed: () => calibrateModal(context),
-                      style: ElevatedButton.styleFrom(minimumSize: const Size(50, 50), padding: EdgeInsets.zero),
-                      child: const Icon(Icons.tune, size: 22),
+                      style: ElevatedButton.styleFrom(minimumSize: const Size(60, 60), padding: EdgeInsets.zero),
+                      child: const Icon(Icons.tune, size: 28),
                     ),
                     ElevatedButton(
                       onPressed: () => resetValuesConfirm(context),
-                      style: ElevatedButton.styleFrom(minimumSize: const Size(50, 50), padding: EdgeInsets.zero),
-                      child: const Icon(Icons.cleaning_services, size: 22),
+                      style: ElevatedButton.styleFrom(minimumSize: const Size(60, 60), padding: EdgeInsets.zero),
+                      child: const Icon(Icons.cleaning_services, size: 28),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 6),
                 if (getMotorStatus().isNotEmpty) ...[
                   Center(
                     child: Chip(
@@ -396,12 +337,15 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
                       context: context,
                       isScrollControlled: true,
                       builder: (BuildContext context) {
+                        final listMetrics = ecuMetrics.where((x) => x.canShowList).toList();
+
                         return StreamBuilder<StreamData>(
                           stream: API.streamData(),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) return const CircularProgressIndicator();
 
-                            final mappedData = ecuDataToMap(snapshot.data ?? StreamData());
+                            final streamData = (snapshot.data ?? StreamData());
+                            final streamDataToMap = streamDataFlatmap(streamData);
 
                             return DraggableScrollableSheet(
                               expand: false,
@@ -432,16 +376,28 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
                                       Expanded(
                                         child: ListView.separated(
                                           controller: scrollController,
-                                          itemCount: mappedData.length,
+                                          itemCount: listMetrics.length,
                                           separatorBuilder: (_, __) => const Divider(color: Colors.white24),
                                           itemBuilder: (context, index) {
-                                            final entry = mappedData.entries.elementAt(index);
+                                            final entry = listMetrics.elementAt(index);
+                                            var entryValue = streamDataToMap[entry.value] ?? "";
+
+                                            if (entryValue is bool) {
+                                              entryValue = entryValue.toString();
+                                            } else if (entryValue is int || entryValue == entryValue.roundToDouble()) {
+                                              entryValue = entryValue.toStringAsFixed(0);
+                                            } else if (entryValue is double) {
+                                              entryValue = entryValue.toStringAsFixed(2);
+                                            } else {
+                                              entryValue = entryValue.toString();
+                                            }
+
                                             return Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Flexible(
                                                   child: Text(
-                                                    entry.key,
+                                                    entry.label,
                                                     style: const TextStyle(
                                                       color: Colors.white70,
                                                       fontWeight: FontWeight.bold,
@@ -451,7 +407,7 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
                                                 const SizedBox(width: 12),
                                                 Flexible(
                                                   child: Text(
-                                                    entry.value.toString(),
+                                                    (entry.unit != null ? "$entryValue ${entry.unit}" : entryValue),
                                                     textAlign: TextAlign.right,
                                                     style: const TextStyle(color: Colors.white),
                                                   ),
@@ -471,12 +427,12 @@ class _EcuDataMenuState extends State<EcuDataMenu> {
                       },
                     );
                   },
-                  style: ElevatedButton.styleFrom(minimumSize: const Size(70, 50), padding: EdgeInsets.zero),
+                  style: ElevatedButton.styleFrom(minimumSize: const Size(70, 60), padding: EdgeInsets.zero),
                   child: const Icon(Icons.remove_red_eye, size: 30),
                 ),
                 ElevatedButton(
                   onPressed: () => showRebootConfirm(context),
-                  style: ElevatedButton.styleFrom(minimumSize: const Size(70, 50), padding: EdgeInsets.zero),
+                  style: ElevatedButton.styleFrom(minimumSize: const Size(70, 60), padding: EdgeInsets.zero),
                   child: const Icon(Icons.refresh_rounded, size: 30),
                 ),
               ],
